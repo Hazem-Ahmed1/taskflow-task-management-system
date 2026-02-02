@@ -1,0 +1,45 @@
+<div class="card" cdkDrag>
+  <div *ngIf="card.labels && card.labels.length > 0" class="card-labels">
+    <span 
+      *ngFor="let label of card.labels"
+      class="card-label"
+      [style.background-color]="getLabelColor(label)">
+    </span>
+  </div>
+
+  <div class="card-title">{{ card.title }}</div>
+
+  <div class="card-badges">
+    <span *ngIf="card.description" class="badge" title="Has description">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <path d="M2 2h10v10H2z"/>
+      </svg>
+    </span>
+
+    <span *ngIf="card.deadline" class="badge">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <circle cx="7" cy="7" r="6"/>
+      </svg>
+      {{ formatDate(card.deadline) }}
+    </span>
+
+    <span *ngIf="card.assignedUsers && card.assignedUsers.length > 0" class="badge">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <path d="M7 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-3 0-7 1.5-7 3.5V14h14v-1.5c0-2-4-3.5-7-3.5z"/>
+      </svg>
+      {{ card.assignedUsers.length }}
+    </span>
+  </div>
+
+  <div *ngIf="card.assignedUsers && card.assignedUsers.length > 0" class="card-members">
+    <app-avatar
+      *ngFor="let userId of card.assignedUsers.slice(0, 3)"
+      [imageUrl]="getUserById(userId)?.avatar || ''"
+      [name]="getUserById(userId)?.name || ''"
+      size="small">
+    </app-avatar>
+    <span *ngIf="card.assignedUsers.length > 3" class="more-members">
+      +{{ card.assignedUsers.length - 3 }}
+    </span>
+  </div>
+</div>

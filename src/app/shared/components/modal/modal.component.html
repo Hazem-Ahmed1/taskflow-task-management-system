@@ -1,0 +1,18 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="handleOverlayClick()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ title }}</h2>
+      <button class="close-btn" (click)="close()" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 8.586L2.929 1.515 1.515 2.929 8.586 10l-7.071 7.071 1.414 1.414L10 11.414l7.071 7.071 1.414-1.414L11.414 10l7.071-7.071-1.414-1.414L10 8.586z"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ng-content select="[modal-body]"></ng-content>
+    </div>
+    <div class="modal-footer" *ngIf="hasFooter">
+      <ng-content select="[modal-footer]"></ng-content>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="app-container">
+  <header class="app-header">
+    <div class="header-left">
+      <h1 class="app-logo" routerLink="/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 4h7v7H4zm0 9h7v7H4zm9-9h7v7h-7zm0 9h7v7h-7z"/>
+        </svg>
+        TaskFlow
+      </h1>
+      <nav class="main-nav">
+        <a routerLink="/boards" routerLinkActive="active">Boards</a>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <app-notification-center></app-notification-center>
+      
+      <div class="user-menu" *ngIf="currentUser">
+        <app-avatar
+          [imageUrl]="currentUser.avatar || ''"
+          [name]="currentUser.name"
+          size="small">
+        </app-avatar>
+        <span class="user-name">{{ currentUser.name }}</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

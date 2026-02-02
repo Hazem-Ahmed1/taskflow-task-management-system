@@ -1,0 +1,81 @@
+<div class="list-container">
+  <div class="list-header">
+    <input 
+      *ngIf="isEditing"
+      class="list-title-input"
+      [(ngModel)]="editTitle"
+      (blur)="saveTitle()"
+      (keyup.enter)="saveTitle()"
+      (keyup.escape)="cancelEdit()"
+      autofocus />
+    <h3 
+      *ngIf="!isEditing"
+      class="list-title"
+      (click)="startEdit()">
+      {{ list.title }}
+    </h3>
+
+    <button class="list-menu-btn" (click)="toggleMenu()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M3 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm6 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm6 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+      </svg>
+    </button>
+
+    <div *ngIf="showMenu" class="list-menu">
+      <button (click)="deleteList()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M5 1h6v2H5zM3 4h10v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </svg>
+        Delete List
+      </button>
+    </div>
+  </div>
+
+  <div 
+    class="cards-container"
+    cdkDropList
+    [cdkDropListData]="list.cards"
+    (cdkDropListDropped)="onCardDrop($event)"
+    [id]="list.id">
+    <app-card-item
+      *ngFor="let card of list.cards"
+      [card]="card"
+      [boardId]="boardId"
+      [listId]="list.id"
+      cdkDrag>
+    </app-card-item>
+  </div>
+
+  <div class="add-card-section">
+    <div *ngIf="!showAddCard" class="add-card-trigger" (click)="showAddCard = true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Add a card</span>
+    </div>
+
+    <div *ngIf="showAddCard" class="add-card-form">
+      <textarea
+        class="card-title-input"
+        placeholder="Enter a title for this card..."
+        [(ngModel)]="newCardTitle"
+        (keyup.escape)="cancelAddCard()"
+        rows="3"
+        autofocus></textarea>
+      <div class="add-card-actions">
+        <app-button 
+          variant="primary" 
+          size="small"
+          [disabled]="!newCardTitle.trim()"
+          (click)="createCard()">
+          Add Card
+        </app-button>
+        <button class="cancel-btn" (click)="cancelAddCard()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 8.586L2.929 1.515 1.515 2.929 8.586 10l-7.071 7.071 1.414 1.414L10 11.414l7.071 7.071 1.414-1.414L11.414 10l7.071-7.071-1.414-1.414L10 8.586z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

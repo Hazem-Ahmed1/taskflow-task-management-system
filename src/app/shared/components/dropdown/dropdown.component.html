@@ -1,0 +1,25 @@
+<div class="dropdown-wrapper">
+  <label *ngIf="label">{{ label }}</label>
+  <div class="dropdown" [class.open]="isOpen">
+    <button 
+      type="button"
+      class="dropdown-toggle" 
+      (click)="toggleDropdown()"
+      [disabled]="disabled">
+      <span class="selected-value">{{ selectedLabel || placeholder }}</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 6l4 4 4-4z"/>
+      </svg>
+    </button>
+    <div class="dropdown-menu" *ngIf="isOpen">
+      <div 
+        *ngFor="let option of options"
+        class="dropdown-item"
+        [class.selected]="option.value === value"
+        (click)="selectOption(option)">
+        <span *ngIf="option.icon" class="icon">{{ option.icon }}</span>
+        <span>{{ option.label }}</span>
+      </div>
+    </div>
+  </div>
+</div>

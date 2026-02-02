@@ -1,0 +1,120 @@
+<app-modal 
+  [(isOpen)]="isOpen"
+  [title]="card?.title || ''"
+  [hasFooter]="false">
+  <div modal-body *ngIf="card">
+    <div class="card-detail-container">
+      <!-- Labels Section -->
+      <div class="detail-section" *ngIf="card.labels && card.labels.length > 0">
+        <h4 class="section-title">Labels</h4>
+        <div class="labels-grid">
+          <span 
+            *ngFor="let label of card.labels"
+            class="label-badge"
+            [style.background-color]="getLabelColor(label)">
+            {{ label }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <div class="detail-section">
+        <h4 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 2h12v12H2z"/>
+          </svg>
+          Description
+        </h4>
+        <div *ngIf="!isEditingDescription && card.description" class="description-content" (click)="startEditingDescription()">
+          {{ card.description }}
+        </div>
+        <div *ngIf="!isEditingDescription && !card.description" class="description-placeholder" (click)="startEditingDescription()">
+          Add a more detailed description...
+        </div>
+        <div *ngIf="isEditingDescription" class="description-edit">
+          <textarea
+            [(ngModel)]="editedDescription"
+            rows="5"
+            placeholder="Add a more detailed description..."
+            autofocus></textarea>
+          <div class="edit-actions">
+            <app-button variant="primary" size="small" (click)="saveDescription()">
+              Save
+            </app-button>
+            <app-button variant="secondary" size="small" (click)="cancelEditingDescription()">
+              Cancel
+            </app-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Section -->
+      <div class="detail-section">
+        <h4 class="section-title">Details</h4>
+        <div class="details-grid">
+          <div class="detail-item">
+            <label>Priority</label>
+            <app-dropdown
+              [options]="priorityOptions"
+              [(value)]="card.priority"
+              (valueChange)="updateCardField('priority', $event)">
+            </app-dropdown>
+          </div>
+
+          <div class="detail-item">
+            <label>Due Date</label>
+            <input 
+              type="date"
+              [value]="formatDateForInput(card.dueDate)"
+              (change)="updateDueDate($event)"
+              class="date-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Members Section -->
+      <div class="detail-section">
+        <h4 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-3.5 0-8 1.75-8 4v2h16v-2c0-2.25-4.5-4-8-4z"/>
+          </svg>
+          Members
+        </h4>
+        <div class="members-list">
+          <div *ngFor="let assignee of card.assignees" class="member-item">
+            <app-avatar
+              [imageUrl]="assignee.avatar || ''"
+              [name]="assignee.name"
+              size="medium">
+            </app-avatar>
+            <span class="member-name">{{ assignee.name }}</span>
+            <button class="remove-member-btn" (click)="removeMember(assignee.id)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 6.586L2.929 1.515 1.515 2.929 6.586 8l-5.071 5.071 1.414 1.414L8 9.414l5.071 5.071 1.414-1.414L9.414 8l5.071-5.071-1.414-1.414L8 6.586z"/>
+              </svg>
+            </button>
+          </div>
+          <app-button variant="secondary" size="small" (click)="openAddMemberModal()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+              <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Add Member
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Actions Section -->
+      <div class="detail-section">
+        <h4 class="section-title">Actions</h4>
+        <div class="actions-list">
+          <app-button variant="danger" size="small" full (click)="deleteCard()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+              <path d="M4 1h6v1H4zM2 3h10v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+            </svg>
+            Delete Card
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modal>

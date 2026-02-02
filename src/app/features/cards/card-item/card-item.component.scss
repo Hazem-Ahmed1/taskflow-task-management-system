@@ -1,0 +1,95 @@
+.card {
+  background: white;
+  border-radius: 4px;
+  padding: 12px;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(9, 30, 66, 0.13);
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(9, 30, 66, 0.15);
+}
+
+.card-labels {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.card-label {
+  width: 40px;
+  height: 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.card-title {
+  font-size: 14px;
+  color: #172b4d;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.card-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #5e6c84;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.badge svg {
+  flex-shrink: 0;
+}
+
+.badge.overdue {
+  background-color: #eb5a46;
+  color: white;
+}
+
+.badge.due-soon {
+  background-color: #f2d600;
+  color: #172b4d;
+}
+
+.card-members {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.more-members {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #dfe1e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #5e6c84;
+}
+
+.cdk-drag-preview {
+  opacity: 0.8;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  transform: rotate(5deg);
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

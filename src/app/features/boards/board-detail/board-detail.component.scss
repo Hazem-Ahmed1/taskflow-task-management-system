@@ -1,0 +1,132 @@
+.board-detail-container {
+  min-height: 100vh;
+  position: relative;
+}
+
+.board-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 0;
+}
+
+.board-header {
+  position: relative;
+  z-index: 1;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.board-header-left,
+.board-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.board-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.star-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.star-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.star-btn.starred {
+  background: #f2d600;
+  color: #172b4d;
+}
+
+.board-members {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-member-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.add-member-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.board-content {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 16px;
+}
+
+.user-search-results {
+  margin-top: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.user-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.user-result-item:hover {
+  background-color: #f4f5f7;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #172b4d;
+}
+
+.user-email {
+  font-size: 12px;
+  color: #5e6c84;
+}
+
+.member-badge {
+  padding: 4px 12px;
+  background-color: #e4f0f6;
+  color: #0079bf;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}

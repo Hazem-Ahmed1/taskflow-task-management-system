@@ -1,0 +1,168 @@
+.card-detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 600px;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #172b4d;
+}
+
+.labels-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.label-badge {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.description-content {
+  padding: 12px;
+  background: #f4f5f7;
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 60px;
+  transition: background-color 0.2s;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.description-content:hover {
+  background: #e4e6ea;
+}
+
+.description-placeholder {
+  padding: 12px;
+  background: #f4f5f7;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #5e6c84;
+  font-style: italic;
+  transition: background-color 0.2s;
+}
+
+.description-placeholder:hover {
+  background: #e4e6ea;
+}
+
+.description-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.description-edit textarea {
+  padding: 12px;
+  border: 2px solid #0079bf;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.description-edit textarea:focus {
+  outline: none;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-item label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5e6c84;
+  text-transform: uppercase;
+}
+
+.date-input {
+  padding: 8px 12px;
+  border: 2px solid #dfe1e6;
+  border-radius: 3px;
+  font-size: 14px;
+  background-color: #fafbfc;
+  transition: border-color 0.2s;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #0079bf;
+  background-color: white;
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background: #f4f5f7;
+  border-radius: 4px;
+}
+
+.member-name {
+  flex: 1;
+  font-size: 14px;
+  color: #172b4d;
+}
+
+.remove-member-btn {
+  background: none;
+  border: none;
+  color: #5e6c84;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.remove-member-btn:hover {
+  background: #eb5a46;
+  color: white;
+}
+
+.actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

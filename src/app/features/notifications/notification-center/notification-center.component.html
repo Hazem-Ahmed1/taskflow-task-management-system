@@ -1,0 +1,58 @@
+<div class="notification-center">
+  <button 
+    class="notification-bell"
+    [class.has-unread]="unreadCount > 0"
+    (click)="togglePanel()">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path d="M10 2a6 6 0 0 1 6 6v3.697l1.832 2.748A1 1 0 0 1 17 16h-4.535a2.5 2.5 0 0 1-4.93 0H3a1 1 0 0 1-.832-1.555L4 11.697V8a6 6 0 0 1 6-6z"/>
+    </svg>
+    <span *ngIf="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
+  </button>
+
+  <div *ngIf="showPanel" class="notification-dropdown">
+    <div class="dropdown-header">
+      <h3>Notifications</h3>
+      <button 
+        *ngIf="unreadCount > 0"
+        class="mark-all-read-btn"
+        (click)="markAllAsRead()">
+        Mark all as read
+      </button>
+    </div>
+
+    <div class="notifications-list">
+      <div 
+        *ngFor="let notification of notifications$ | async"
+        class="notification-item"
+        [class.unread]="!notification.isRead"
+        (click)="handleNotificationClick(notification)">
+        <div class="notification-content">
+          <div class="notification-icon">
+            {{ getNotificationIcon(notification.type) }}
+          </div>
+
+          <div class="notification-text">
+            <p class="notification-message">{{ notification.message }}</p>
+            <span class="notification-time">{{ notification.createdAt | date:'short' }}</span>
+          </div>
+        </div>
+
+        <button 
+          class="dismiss-btn"
+          (click)="deleteNotification($event, notification.id)"
+          [attr.aria-label]="'Dismiss notification'">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 6.586L2.929 1.515 1.515 2.929 6.586 8l-5.071 5.071 1.414 1.414L8 9.414l5.071 5.071 1.414-1.414L9.414 8l5.071-5.071-1.414-1.414L8 6.586z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div *ngIf="(notifications$ | async)?.length === 0" class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="currentColor" opacity="0.3">
+          <path d="M24 8a14 14 0 0 1 14 14v8.545l3.665 5.498A2 2 0 0 1 40 39H28.07a7 7 0 0 1-13.858 0H8a2 2 0 0 1-1.665-3.002L10 30.545V22A14 14 0 0 1 24 8z"/>
+        </svg>
+        <p>No notifications</p>
+      </div>
+    </div>
+  </div>
+</div>

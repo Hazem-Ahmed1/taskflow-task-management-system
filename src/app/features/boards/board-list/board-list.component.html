@@ -1,0 +1,89 @@
+<div class="boards-container">
+  <div class="boards-header">
+    <h1>Your Boards</h1>
+    <app-button variant="primary" size="medium" (click)="openCreateModal()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Create Board
+    </app-button>
+  </div>
+
+  <div class="boards-grid">
+    <div 
+      *ngFor="let board of boards$ | async"
+      class="board-card"
+      [style.background]="board.backgroundColor"
+      (click)="openBoard(board.id)">
+      <div class="board-card-overlay"></div>
+      <div class="board-card-content">
+        <h3 class="board-title">{{ board.title }}</h3>
+        <button 
+          class="star-btn"
+          [class.starred]="board.isStarred"
+          (click)="toggleStar($event, board.id)"
+          [attr.aria-label]="board.isStarred ? 'Unstar board' : 'Star board'">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 1l3 6 6.5 1-4.75 4.5 1.25 6.5L10 16l-5.75 3 1.25-6.5L1 8l6.5-1z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="create-board-card" (click)="openCreateModal()">
+      <div class="create-board-content">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+          <path d="M16 6v20M6 16h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Create new board</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Board Modal -->
+  <app-modal 
+    [(isOpen)]="showCreateModal"
+    title="Create Board"
+    [hasFooter]="true">
+    <div modal-body>
+      <form (submit)="createBoard($event)">
+        <app-input
+          label="Board Title"
+          placeholder="Enter board title"
+          [(value)]="newBoard.title"
+          [error]="errors.title">
+        </app-input>
+
+        <app-input
+          label="Description (optional)"
+          placeholder="Enter board description"
+          [(value)]="newBoard.description">
+        </app-input>
+
+        <div class="form-group">
+          <label>Background Color</label>
+          <div class="background-colors">
+            <div 
+              *ngFor="let color of colorOptions"
+              class="color-option"
+              [style.background]="color"
+              [class.selected]="newBoard.backgroundColor === color"
+              (click)="newBoard.backgroundColor = color">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div modal-footer>
+      <app-button variant="secondary" (click)="closeCreateModal()">
+        Cancel
+      </app-button>
+      <app-button 
+        variant="primary" 
+        (click)="createBoard($event)">
+        Create
+      </app-button>
+    </div>
+  </app-modal>
+</div>

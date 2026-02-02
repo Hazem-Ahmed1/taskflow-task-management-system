@@ -1,0 +1,12 @@
+<div 
+  class="avatar" 
+  [class]="'avatar-' + size"
+  [style.background-color]="backgroundColor"
+  [title]="name">
+  <img 
+    *ngIf="imageUrl" 
+    [src]="imageUrl" 
+    [alt]="name"
+    (error)="onImageError()" />
+  <span *ngIf="!imageUrl" class="initials">{{ initials }}</span>
+</div>

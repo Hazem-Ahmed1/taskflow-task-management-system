@@ -1,0 +1,172 @@
+.list-container {
+  width: 280px;
+  background: #ebecf0;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 150px);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.list-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #172b4d;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  flex: 1;
+  transition: background-color 0.2s;
+}
+
+.list-title:hover {
+  background-color: rgba(9, 30, 66, 0.08);
+}
+
+.list-title-input {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #172b4d;
+  padding: 6px 8px;
+  border: 2px solid #0079bf;
+  border-radius: 4px;
+  background: white;
+}
+
+.list-menu-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: #5e6c84;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.list-menu-btn:hover {
+  background-color: rgba(9, 30, 66, 0.08);
+}
+
+.list-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  min-width: 150px;
+  z-index: 10;
+}
+
+.list-menu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #172b4d;
+  transition: background-color 0.2s;
+}
+
+.list-menu button:hover {
+  background-color: #f4f5f7;
+}
+
+.cards-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px;
+  margin: -4px;
+  min-height: 20px;
+}
+
+.add-card-section {
+  margin-top: 8px;
+}
+
+.add-card-trigger {
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #5e6c84;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.add-card-trigger:hover {
+  background-color: rgba(9, 30, 66, 0.08);
+}
+
+.add-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-title-input {
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  box-shadow: 0 1px 0 rgba(9, 30, 66, 0.13);
+}
+
+.card-title-input:focus {
+  outline: 2px solid #0079bf;
+}
+
+.add-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cancel-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #5e6c84;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.cancel-btn:hover {
+  color: #172b4d;
+}
+
+.cdk-drag-preview {
+  opacity: 0.8;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.4;
+}
