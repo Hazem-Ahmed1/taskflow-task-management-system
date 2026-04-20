@@ -1,0 +1,75 @@
+<div class="activity-page">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Activity Log
+      </h1>
+      <p class="page-sub">Everything that happened in your workspace</p>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="groups.length === 0">
+    <div class="empty-icon">📋</div>
+    <h3>No activity yet</h3>
+    <p>Start creating boards, lists, and cards — they'll all appear here.</p>
+    <a routerLink="/boards" class="empty-cta">Go to Boards</a>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline" *ngIf="groups.length > 0">
+    <div class="day-group" *ngFor="let group of groups">
+
+      <!-- Date divider -->
+      <div class="date-label">
+        <span>{{ group.label }}</span>
+      </div>
+
+      <!-- Entries -->
+      <div class="entry" *ngFor="let e of group.entries">
+
+        <!-- Avatar of who did it -->
+        <div class="entry-avatar">
+          <app-avatar
+            [imageUrl]="getUser(e.userId)?.avatar || ''"
+            [name]="getActorLabel(e.userId)"
+            size="medium">
+          </app-avatar>
+        </div>
+
+        <!-- Icon dot -->
+        <div class="action-dot" [class]="getColorClass(e.action)">
+          {{ getIcon(e.action) }}
+        </div>
+
+        <!-- Text + meta -->
+        <div class="entry-body">
+          <p class="entry-text">
+            <span class="actor-name">{{ getActorLabel(e.userId) }}</span>
+            {{ e.description }}
+          </p>
+          <div class="entry-meta">
+            <span class="time-ago">{{ timeAgo(e.createdAt) }}</span>
+            <button
+              *ngIf="e.boardId"
+              class="board-link"
+              (click)="navigateToBoard(e)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+              </svg>
+              {{ e.boardTitle }}
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /entry -->
+    </div><!-- /day-group -->
+  </div><!-- /timeline -->
+
+</div>

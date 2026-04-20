@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Board } from '../models';
-import { DatabaseService } from './database.service';
+import { ActivityAction } from '../models/activity.model';
+import { DatabaseService } from './database';
+import { ActivityService } from './activity';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class BoardService {
   private boardsSubject = new BehaviorSubject<Board[]>([]);
   private selectedBoardSubject = new BehaviorSubject<Board | null>(null);
@@ -13,7 +13,7 @@ export class BoardService {
   public boards$: Observable<Board[]> = this.boardsSubject.asObservable();
   public selectedBoard$: Observable<Board | null> = this.selectedBoardSubject.asObservable();
 
-  constructor(private db: DatabaseService) {}
+  constructor(private db: DatabaseService, private activity: ActivityService) {}
 
   loadBoardsForUser(userId: string): void {
     const boards = this.db.getBoardsByUser(userId).map(b => this.hydrateBoard(b as unknown as Board));
@@ -24,20 +24,24 @@ export class BoardService {
     return this.boards$;
   }
 
+  /** Synchronous snapshot of all boards currently loaded for the user */
+  getBoardsSnapshot(): Board[] {
+    return this.boardsSubject.value;
+  }
+
+  /** IDs of all boards the current user can access (own + invited) */
+  getUserBoardIds(): Set<string> {
+    return new Set(this.boardsSubject.value.map(b => b.id));
+  }
+
   getBoardById(id: string): Board | undefined {
     return this.boardsSubject.value.find(b => b.id === id);
   }
 
-  /**
-   * Find which board contains a specific card.
-   * Used by notification deep-links to open the right board/task.
-   */
   findBoardIdByCardId(cardId: string): string | null {
     for (const board of this.boardsSubject.value) {
       for (const list of board.lists) {
-        if (list.cards.some(card => card.id === cardId)) {
-          return board.id;
-        }
+        if (list.cards.some(card => card.id === cardId)) return board.id;
       }
     }
     return null;
@@ -54,6 +58,11 @@ export class BoardService {
     this.db.createBoard(newBoard);
     const current = this.boardsSubject.value;
     this.boardsSubject.next([...current, newBoard]);
+
+    this.activity.log(ActivityAction.BOARD_CREATED, `Created board "${newBoard.title}"`, {
+      boardId: newBoard.id, boardTitle: newBoard.title
+    });
+
     return newBoard;
   }
 
@@ -70,12 +79,24 @@ export class BoardService {
     }
   }
 
+  updateBoardWithLog(id: string, updates: Partial<Board>, boardTitle: string): void {
+    this.updateBoard(id, updates);
+    this.activity.log(ActivityAction.BOARD_UPDATED, `Updated board "${boardTitle}"`, {
+      boardId: id, boardTitle
+    });
+  }
+
   deleteBoard(id: string): void {
+    const board = this.getBoardById(id);
     this.db.deleteBoard(id);
     const boards = this.boardsSubject.value.filter(b => b.id !== id);
     this.boardsSubject.next(boards);
     if (this.selectedBoardSubject.value?.id === id) {
       this.selectedBoardSubject.next(null);
+    }
+
+    if (board) {
+      this.activity.log(ActivityAction.BOARD_DELETED, `Deleted board "${board.title}"`);
     }
   }
 
@@ -89,10 +110,16 @@ export class BoardService {
     this.updateBoard(id, { isStarred: !board.isStarred });
   }
 
-  addMember(boardId: string, userId: string): void {
+  addMember(boardId: string, userId: string, memberName?: string): void {
     const board = this.getBoardById(boardId);
     if (!board || board.members.includes(userId)) return;
     this.updateBoard(boardId, { members: [...board.members, userId] });
+
+    this.activity.log(
+      ActivityAction.MEMBER_ADDED,
+      `Added ${memberName ?? userId} to board "${board.title}"`,
+      { boardId, boardTitle: board.title }
+    );
   }
 
   removeMember(boardId: string, userId: string): void {

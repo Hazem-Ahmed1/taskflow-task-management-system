@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User, LoginCredentials, RegisterData, AuthResult, AuthSession } from '../models';
-import { DatabaseService } from './database.service';
+import { DatabaseService } from './database';
 
 const SESSION_KEY = 'taskflow_session';
 

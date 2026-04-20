@@ -5,6 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Board, User } from '@core/models';
 import { BoardService, UserService } from '@core/services';
 import { AuthService } from '@core/services';
+import { NotificationService } from '@core/services/notification';
 import { SharedModule } from '@shared/shared.module';
 import { BoardContentComponent } from '../board-content/board-content.component';
 
@@ -31,6 +32,7 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
   memberSearchQuery = '';
   filteredUsers: User[] = [];
   allUsers: User[] = [];
+  private routeBoardId: string | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -39,7 +41,8 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private boardService: BoardService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {}
 
   get isOwner(): boolean {
@@ -50,8 +53,19 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     this.route.params
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
-        const boardId = params['id'];
+        const boardId = params['id'] as string;
+        this.routeBoardId = boardId;
         this.loadBoard(boardId);
+      });
+
+    // Keep board view synced even if board list updates after initial route load
+    this.boardService.boards$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        const boardId = this.routeBoardId;
+        if (boardId) {
+          this.loadBoard(boardId);
+        }
       });
 
     this.userService.getUsers()
@@ -114,8 +128,12 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
 
   addMember(userId: string): void {
     if (this.board && !this.isMember(userId)) {
-      this.boardService.addMember(this.board.id, userId);
-      this.loadBoard(this.board.id);
+      const memberName = this.userService.getUserById(userId)?.name;
+      this.boardService.addMember(this.board.id, userId, memberName);
+      if (userId !== this.authService.currentUser?.id) {
+        this.notificationService.notifyBoardInvitation(userId, this.board.title, this.board.id);
+      }
+      this.loadBoard(this.board.id); 
     }
   }
 

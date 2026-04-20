@@ -5,12 +5,14 @@ import { BoardDetailComponent } from './features/boards/board-detail/board-detai
 import { BoardContentComponent } from './features/boards/board-content/board-content.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
+import { ProfileComponent } from './features/profile/profile.component';
+import { ActivityLogComponent } from './features/activity/activity-log.component';
+import { NotFoundComponent } from './features/not-found/not-found.component';
 import { authGuard } from './core/guards/auth.guard';
 import { noAuthGuard } from './core/guards/no-auth.guard';
 
 export const routes: Routes = [
   {
-    // Public index — shows board previews; auto-redirects to /boards if already logged in
     path: '',
     component: LandingComponent,
     title: 'TaskFlow | Home'
@@ -47,7 +49,20 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [authGuard],
+    title: 'TaskFlow | Profile'
+  },
+  {
+    path: 'activity',
+    component: ActivityLogComponent,
+    canActivate: [authGuard],
+    title: 'TaskFlow | Activity Log'
+  },
+  {
     path: '**',
-    redirectTo: '/'
+    component: NotFoundComponent,
+    title: 'TaskFlow | 404'
   }
 ];

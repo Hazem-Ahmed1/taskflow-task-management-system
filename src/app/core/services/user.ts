@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../models';
-import { DatabaseService } from './database.service';
+import { DatabaseService } from './database';
 
 @Injectable({
   providedIn: 'root'

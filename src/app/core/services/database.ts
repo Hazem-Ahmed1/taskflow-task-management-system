@@ -10,7 +10,7 @@ interface DatabaseSchema {
   notifications: AnyRecord[];
 }
 
-const DB_KEY = 'taskflow_db';
+const DB_KEY = 'taskflow_db_v2';
 
 @Injectable({
   providedIn: 'root'
