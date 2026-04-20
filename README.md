@@ -1,14 +1,16 @@
-# Taskflow - Task Management System (Angular 17+)
+## Taskflow - Task Management System (Angular 17+)
+## Live Preview 
+https://task-flow-dffc7.web.app/
 
 TaskFlow is a modern trello-inspired task management system built with **Angular 17+ (standalone components)**. It includes **authentication & authorization (demo accounts)**, **drag & drop**, **notifications**, and a clean, modern UI.
 
-![Angular](https://img.shields.io/badge/Angular-21-red?style=flat-square&logo=angular)
+![Angular](https://img.shields.io/badge/Angular-17+-red?style=flat-square&logo=angular)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue?style=flat-square&logo=typescript)
 ![HTML5](https://img.shields.io/badge/HTML5-orange?style=flat-square&logo=html5)
 ![SCSS](https://img.shields.io/badge/SCSS-pink?style=flat-square&logo=sass)
 ![Angular CDK](https://img.shields.io/badge/Angular%20CDK-UI%20Toolkit-red?style=flat-square&logo=angular)
 ![RxJS](https://img.shields.io/badge/RxJS-reactive-purple?style=flat-square&logo=reactivex)
-
+![Hosting](https://img.shields.io/badge/Firebase%20Hosting-deploy-orange?style=flat-square&logo=firebase)
 
 ## Screenshots
 
