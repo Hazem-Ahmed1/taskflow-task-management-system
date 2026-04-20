@@ -42,7 +42,8 @@
       [card]="card"
       [boardId]="boardId"
       [listId]="list.id"
-      cdkDrag>
+      cdkDrag
+      (cardClicked)="onCardClicked($event)">
     </app-card-item>
   </div>
 

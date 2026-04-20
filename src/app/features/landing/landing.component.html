@@ -1,0 +1,161 @@
+<!-- Public nav — shown only on the landing page (not inside the authenticated app shell) -->
+<div class="landing-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+        <path d="M4 4h7v7H4zm0 9h7v7H4zm9-9h7v7h-7zm0 9h7v7h-7z"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">TaskFlow</span>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn-ghost" (click)="signIn()">Sign in</button>
+    <button class="btn-primary-sm" (click)="register()">
+      Get started free
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Page body — same container style as the authenticated boards page -->
+<div class="boards-container">
+
+  <!-- Header row -->
+  <div class="boards-header">
+    <div class="boards-header-text">
+      <h1>Explore Boards</h1>
+      <p>Browse sample project boards — sign in to start managing your own</p>
+    </div>
+    <button class="btn-create" (click)="createBoard()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M8 2v12M2 8h12"/>
+      </svg>
+      Create Board
+    </button>
+  </div>
+
+  <div class="section-label">Sample Boards</div>
+
+  <!-- Board grid -->
+  <div class="boards-grid">
+    <div
+      *ngFor="let board of boards"
+      class="board-card"
+      [style.--board-color]="board.backgroundColor"
+      (click)="openBoard(board.id)">
+
+      <!-- Colour header strip -->
+      <div class="board-banner" [style.background]="board.backgroundColor">
+        <span *ngIf="board.isStarred" class="star-badge">
+          <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 1l3 6 6.5 1-4.75 4.5 1.25 6.5L10 16l-5.75 3 1.25-6.5L1 8l6.5-1z"/>
+          </svg>
+        </span>
+        <!-- Top-priority indicator dot -->
+        <span class="priority-dot" [class]="'dot-' + board.topPriority"></span>
+      </div>
+
+      <div class="board-body">
+        <!-- Title + description -->
+        <h3 class="board-title">{{ board.title }}</h3>
+        <p class="board-desc">{{ board.description }}</p>
+
+        <!-- Priority badges -->
+        <div class="priority-row" *ngIf="board.priority.total > 0">
+          <span *ngIf="board.priority.urgent > 0" class="priority-badge urgent">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            {{ board.priority.urgent }} Urgent
+          </span>
+          <span *ngIf="board.priority.high > 0" class="priority-badge high">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            {{ board.priority.high }} High
+          </span>
+          <span *ngIf="board.priority.medium > 0" class="priority-badge medium">
+            {{ board.priority.medium }} Medium
+          </span>
+          <span *ngIf="board.priority.low > 0" class="priority-badge low">
+            {{ board.priority.low }} Low
+          </span>
+        </div>
+
+        <!-- Meta row -->
+        <div class="board-meta">
+          <div class="meta-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+            {{ board.listCount }} lists
+          </div>
+          <div class="meta-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+            {{ board.priority.total }} tasks
+          </div>
+
+          <!-- Member avatars -->
+          <div class="member-avatars">
+            <div
+              *ngFor="let uid of board.members.slice(0, 4)"
+              class="member-avatar"
+              [style.background]="getUserColor(uid)"
+              [title]="uid">
+              {{ getInitials(uid) }}
+            </div>
+            <span *ngIf="board.members.length > 4" class="members-more">
+              +{{ board.members.length - 4 }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hover overlay CTA -->
+      <div class="board-overlay">
+        <span class="overlay-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          </svg>
+          Sign in to view
+        </span>
+      </div>
+    </div>
+
+    <!-- Create new board card -->
+    <div class="create-board-card" (click)="createBoard()">
+      <div class="create-board-content">
+        <div class="create-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </div>
+        <span class="create-label">Create new board</span>
+        <span class="create-hint">Sign in to get started</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom CTA banner -->
+  <div class="cta-strip">
+    <div class="cta-strip-text">
+      <strong>Ready to organise your team's work?</strong>
+      <span>Create your free account and start managing tasks in seconds.</span>
+    </div>
+    <div class="cta-strip-actions">
+      <button class="btn-ghost-dark" (click)="signIn()">I already have an account</button>
+      <button class="btn-primary-sm" (click)="register()">
+        Get started free
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

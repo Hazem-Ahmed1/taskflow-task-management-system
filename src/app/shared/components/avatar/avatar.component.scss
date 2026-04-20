@@ -5,26 +5,34 @@
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  font-weight: 600;
+  font-weight: 700;
   color: white;
+  font-family: var(--font-display);
+  box-shadow: 0 0 0 2px white, 0 0 0 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.avatar:hover {
+  box-shadow: 0 0 0 2px white, 0 0 0 3.5px var(--color-primary);
+  transform: scale(1.06);
 }
 
 .avatar-small {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   font-size: 10px;
 }
 
 .avatar-medium {
-  width: 32px;
-  height: 32px;
-  font-size: 12px;
+  width: 34px;
+  height: 34px;
+  font-size: 13px;
 }
 
 .avatar-large {
-  width: 48px;
-  height: 48px;
-  font-size: 16px;
+  width: 50px;
+  height: 50px;
+  font-size: 18px;
 }
 
 img {
@@ -35,4 +43,5 @@ img {
 
 .initials {
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }

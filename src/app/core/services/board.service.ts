@@ -1,15 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Board } from '../models';
+import { DatabaseService } from './database.service';
 
-/**
- * BoardService - Manages all board-related operations
- * 
- * Architecture:
- * - Uses BehaviorSubject for reactive state management
- * - Provides CRUD operations for boards
- * - Maintains a single source of truth for board data
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -20,153 +13,99 @@ export class BoardService {
   public boards$: Observable<Board[]> = this.boardsSubject.asObservable();
   public selectedBoard$: Observable<Board | null> = this.selectedBoardSubject.asObservable();
 
-  constructor() {
-    this.initializeMockData();
+  constructor(private db: DatabaseService) {}
+
+  loadBoardsForUser(userId: string): void {
+    const boards = this.db.getBoardsByUser(userId).map(b => this.hydrateBoard(b as unknown as Board));
+    this.boardsSubject.next(boards);
   }
 
-  /**
-   * Get all boards
-   */
   getBoards(): Observable<Board[]> {
     return this.boards$;
   }
 
-  /**
-   * Get board by ID
-   */
   getBoardById(id: string): Board | undefined {
-    return this.boardsSubject.value.find(board => board.id === id);
+    return this.boardsSubject.value.find(b => b.id === id);
   }
 
   /**
-   * Create new board
+   * Find which board contains a specific card.
+   * Used by notification deep-links to open the right board/task.
    */
+  findBoardIdByCardId(cardId: string): string | null {
+    for (const board of this.boardsSubject.value) {
+      for (const list of board.lists) {
+        if (list.cards.some(card => card.id === cardId)) {
+          return board.id;
+        }
+      }
+    }
+    return null;
+  }
+
   createBoard(board: Omit<Board, 'id' | 'createdAt' | 'updatedAt'>): Board {
     const newBoard: Board = {
       ...board,
-      id: this.generateId(),
+      id: this.db.generateId('board'),
       createdAt: new Date(),
       updatedAt: new Date(),
       lists: []
     };
-
-    const boards = [...this.boardsSubject.value, newBoard];
-    this.boardsSubject.next(boards);
+    this.db.createBoard(newBoard);
+    const current = this.boardsSubject.value;
+    this.boardsSubject.next([...current, newBoard]);
     return newBoard;
   }
 
-  /**
-   * Update existing board
-   */
   updateBoard(id: string, updates: Partial<Board>): void {
-    const boards = this.boardsSubject.value.map(board =>
-      board.id === id
-        ? { ...board, ...updates, updatedAt: new Date() }
-        : board
+    this.db.updateBoard(id, updates);
+    const boards = this.boardsSubject.value.map(b =>
+      b.id === id ? { ...b, ...updates, updatedAt: new Date() } : b
     );
     this.boardsSubject.next(boards);
 
-    // Update selected board if it's the one being updated
-    const selectedBoard = this.selectedBoardSubject.value;
-    if (selectedBoard && selectedBoard.id === id) {
-      this.selectedBoardSubject.next({ ...selectedBoard, ...updates, updatedAt: new Date() });
+    const selected = this.selectedBoardSubject.value;
+    if (selected?.id === id) {
+      this.selectedBoardSubject.next({ ...selected, ...updates, updatedAt: new Date() });
     }
   }
 
-  /**
-   * Delete board
-   */
   deleteBoard(id: string): void {
-    const boards = this.boardsSubject.value.filter(board => board.id !== id);
+    this.db.deleteBoard(id);
+    const boards = this.boardsSubject.value.filter(b => b.id !== id);
     this.boardsSubject.next(boards);
-
-    // Clear selected board if it's the one being deleted
     if (this.selectedBoardSubject.value?.id === id) {
       this.selectedBoardSubject.next(null);
     }
   }
 
-  /**
-   * Select a board
-   */
   selectBoard(board: Board | null): void {
     this.selectedBoardSubject.next(board);
   }
 
-  /**
-   * Toggle board star
-   */
   toggleStar(id: string): void {
-    const boards = this.boardsSubject.value.map(board =>
-      board.id === id
-        ? { ...board, isStarred: !board.isStarred }
-        : board
-    );
-    this.boardsSubject.next(boards);
+    const board = this.getBoardById(id);
+    if (!board) return;
+    this.updateBoard(id, { isStarred: !board.isStarred });
   }
 
-  /**
-   * Add member to board
-   */
   addMember(boardId: string, userId: string): void {
-    const boards = this.boardsSubject.value.map(board =>
-      board.id === boardId
-        ? { ...board, members: [...board.members, userId] }
-        : board
-    );
-    this.boardsSubject.next(boards);
+    const board = this.getBoardById(boardId);
+    if (!board || board.members.includes(userId)) return;
+    this.updateBoard(boardId, { members: [...board.members, userId] });
   }
 
-  /**
-   * Remove member from board
-   */
   removeMember(boardId: string, userId: string): void {
-    const boards = this.boardsSubject.value.map(board =>
-      board.id === boardId
-        ? { ...board, members: board.members.filter(id => id !== userId) }
-        : board
-    );
-    this.boardsSubject.next(boards);
+    const board = this.getBoardById(boardId);
+    if (!board) return;
+    this.updateBoard(boardId, { members: board.members.filter(id => id !== userId) });
   }
 
-  /**
-   * Generate unique ID
-   */
-  private generateId(): string {
-    return `board_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Initialize with mock data for demonstration
-   */
-  private initializeMockData(): void {
-    const mockBoards: Board[] = [
-      {
-        id: 'board_1',
-        title: 'Project Alpha',
-        description: 'Main project board',
-        ownerId: 'user_1',
-        members: ['user_1', 'user_2'],
-        lists: [],
-        backgroundColor: '#0079bf',
-        createdAt: new Date('2026-01-01'),
-        updatedAt: new Date('2026-01-01'),
-        isStarred: true
-      },
-      {
-        id: 'board_2',
-        title: 'Marketing Campaign',
-        description: 'Q1 Marketing initiatives',
-        ownerId: 'user_1',
-        members: ['user_1', 'user_3'],
-        lists: [],
-        backgroundColor: '#d29034',
-        createdAt: new Date('2026-01-15'),
-        updatedAt: new Date('2026-01-15'),
-        isStarred: false
-      }
-    ];
-
-    this.boardsSubject.next(mockBoards);
+  private hydrateBoard(board: Board): Board {
+    return {
+      ...board,
+      createdAt: new Date(board.createdAt),
+      updatedAt: new Date(board.updatedAt)
+    };
   }
 }

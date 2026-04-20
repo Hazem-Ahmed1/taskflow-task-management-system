@@ -1,69 +1,94 @@
 .board-content-container {
-  height: calc(100vh - 110px);
-  overflow-x: auto;
-  overflow-y: hidden;
+  height: calc(100vh - 116px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .lists-container {
   display: flex;
-  gap: 16px;
-  padding: 8px;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 8px 16px 16px;
   align-items: flex-start;
+  align-content: flex-start;
   min-height: 100%;
+  width: 100%;
 }
 
 .list-wrapper {
-  flex-shrink: 0;
+  flex: 0 1 272px;
 }
 
+/* Add List Area */
 .add-list-wrapper {
-  flex-shrink: 0;
-  width: 280px;
+  flex: 0 1 272px;
+  width: 272px;
+}
+
+@media (max-width: 640px) {
+  .lists-container {
+    padding: 8px 10px 14px;
+    gap: 10px;
+  }
+
+  .list-wrapper,
+  .add-list-wrapper {
+    flex: 1 1 100%;
+    width: 100%;
+  }
 }
 
 .add-list-trigger {
   background: rgba(255, 255, 255, 0.2);
-  padding: 12px;
-  border-radius: 8px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.4);
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
   color: white;
   font-weight: 500;
-  transition: background-color 0.2s;
+  font-size: 14px;
+  transition: all var(--transition-base);
+  backdrop-filter: blur(4px);
 }
 
 .add-list-trigger:hover {
   background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
 }
 
 .add-list-form {
-  background: #ebecf0;
+  background: var(--color-surface);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--color-border);
 }
 
 .add-list-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .cancel-btn {
   background: none;
   border: none;
-  padding: 4px;
+  padding: 6px;
   cursor: pointer;
-  color: #5e6c84;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: color 0.2s;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
 .cancel-btn:hover {
-  color: #172b4d;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
 }

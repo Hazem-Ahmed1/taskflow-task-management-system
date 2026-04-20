@@ -1,10 +1,23 @@
 <app-modal 
-  [(isOpen)]="isOpen"
-  [title]="card?.title || ''"
-  [hasFooter]="false">
+  [isOpen]="isOpen"
+  [title]="card?.title || 'Card Detail'"
+  [hasFooter]="false"
+  (isOpenChange)="onModalChange($event)">
   <div modal-body *ngIf="card">
     <div class="card-detail-container">
-      <!-- Labels Section -->
+
+      <!-- Completed banner at the top -->
+      <div *ngIf="isCompleted" class="completed-banner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span>This card is marked as <strong>Completed</strong></span>
+        <button class="undo-complete-btn" (click)="undoComplete()" title="Mark as incomplete">
+          Undo
+        </button>
+      </div>
+
+      <!-- Labels -->
       <div class="detail-section" *ngIf="card.labels && card.labels.length > 0">
         <h4 class="section-title">Labels</h4>
         <div class="labels-grid">
@@ -17,20 +30,29 @@
         </div>
       </div>
 
-      <!-- Description Section -->
+      <!-- Description -->
       <div class="detail-section">
         <h4 class="section-title">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M2 2h12v12H2z"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
           </svg>
           Description
         </h4>
-        <div *ngIf="!isEditingDescription && card.description" class="description-content" (click)="startEditingDescription()">
+
+        <div *ngIf="!isEditingDescription && card.description" 
+             class="description-content" 
+             (click)="startEditingDescription()"
+             title="Click to edit">
           {{ card.description }}
         </div>
-        <div *ngIf="!isEditingDescription && !card.description" class="description-placeholder" (click)="startEditingDescription()">
+
+        <div *ngIf="!isEditingDescription && !card.description" 
+             class="description-placeholder" 
+             (click)="startEditingDescription()">
           Add a more detailed description...
         </div>
+
         <div *ngIf="isEditingDescription" class="description-edit">
           <textarea
             [(ngModel)]="editedDescription"
@@ -38,17 +60,13 @@
             placeholder="Add a more detailed description..."
             autofocus></textarea>
           <div class="edit-actions">
-            <app-button variant="primary" size="small" (click)="saveDescription()">
-              Save
-            </app-button>
-            <app-button variant="secondary" size="small" (click)="cancelEditingDescription()">
-              Cancel
-            </app-button>
+            <app-button variant="primary" size="small" (click)="saveDescription()">Save</app-button>
+            <app-button variant="secondary" size="small" (click)="cancelEditingDescription()">Cancel</app-button>
           </div>
         </div>
       </div>
 
-      <!-- Details Section -->
+      <!-- Details -->
       <div class="detail-section">
         <h4 class="section-title">Details</h4>
         <div class="details-grid">
@@ -56,7 +74,7 @@
             <label>Priority</label>
             <app-dropdown
               [options]="priorityOptions"
-              [(value)]="card.priority"
+              [value]="card.priority"
               (valueChange)="updateCardField('priority', $event)">
             </app-dropdown>
           </div>
@@ -65,56 +83,120 @@
             <label>Due Date</label>
             <input 
               type="date"
-              [value]="formatDateForInput(card.dueDate)"
+              [value]="formatDateForInput(card.deadline)"
               (change)="updateDueDate($event)"
               class="date-input" />
           </div>
         </div>
       </div>
 
-      <!-- Members Section -->
+      <!-- Members -->
       <div class="detail-section">
         <h4 class="section-title">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-3.5 0-8 1.75-8 4v2h16v-2c0-2.25-4.5-4-8-4z"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
           Members
         </h4>
+
         <div class="members-list">
-          <div *ngFor="let assignee of card.assignees" class="member-item">
+          <div *ngFor="let assignee of assignees" class="member-item">
             <app-avatar
               [imageUrl]="assignee.avatar || ''"
               [name]="assignee.name"
               size="medium">
             </app-avatar>
             <span class="member-name">{{ assignee.name }}</span>
-            <button class="remove-member-btn" (click)="removeMember(assignee.id)">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 6.586L2.929 1.515 1.515 2.929 6.586 8l-5.071 5.071 1.414 1.414L8 9.414l5.071 5.071 1.414-1.414L9.414 8l5.071-5.071-1.414-1.414L8 6.586z"/>
+            <button class="remove-member-btn" (click)="removeMember(assignee.id)" title="Remove">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           </div>
+
           <app-button variant="secondary" size="small" (click)="openAddMemberModal()">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-              <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
             Add Member
           </app-button>
+
+          <!-- Inline member picker -->
+          <div *ngIf="showMemberPicker" class="member-picker">
+            <p *ngIf="availableUsers.length === 0" class="picker-empty">No more members to add</p>
+            <div *ngFor="let user of availableUsers" 
+                 class="picker-option" 
+                 (click)="addMember(user.id)">
+              <app-avatar
+                [imageUrl]="user.avatar || ''"
+                [name]="user.name"
+                size="small">
+              </app-avatar>
+              <span>{{ user.name }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Actions Section -->
+      <!-- Completion -->
+      <div class="detail-section" *ngIf="!isCompleted">
+        <h4 class="section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Mark as Complete
+        </h4>
+
+        <div *ngIf="!showCompletionForm">
+          <app-button variant="primary" size="small" (click)="startComplete()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Mark as Complete
+          </app-button>
+        </div>
+
+        <div *ngIf="showCompletionForm" class="completion-form">
+          <textarea
+            [(ngModel)]="completionNote"
+            rows="3"
+            placeholder="Add a completion note (optional)…"></textarea>
+          <div class="edit-actions">
+            <app-button variant="primary" size="small" (click)="confirmComplete()">
+              Confirm Complete
+            </app-button>
+            <app-button variant="secondary" size="small" (click)="cancelComplete()">
+              Cancel
+            </app-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completion note (read-only when completed) -->
+      <div class="detail-section completion-note-section" *ngIf="isCompleted && card.completionNote">
+        <h4 class="section-title">Completion Note</h4>
+        <p class="completion-note-text">{{ card.completionNote }}</p>
+      </div>
+
+      <!-- Actions -->
       <div class="detail-section">
         <h4 class="section-title">Actions</h4>
         <div class="actions-list">
-          <app-button variant="danger" size="small" full (click)="deleteCard()">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-              <path d="M4 1h6v1H4zM2 3h10v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+          <app-button variant="danger" size="small" (click)="deleteCard()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
             </svg>
             Delete Card
           </app-button>
         </div>
       </div>
+
     </div>
   </div>
 </app-modal>

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Board, User } from '@core/models';
 import { BoardService, UserService } from '@core/services';
+import { AuthService } from '@core/services';
 import { SharedModule } from '@shared/shared.module';
 import { BoardContentComponent } from '../board-content/board-content.component';
 
@@ -37,8 +38,13 @@ export class BoardDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private boardService: BoardService,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService
   ) {}
+
+  get isOwner(): boolean {
+    return !!this.board && this.board.ownerId === this.authService.currentUser?.id;
+  }
 
   ngOnInit(): void {
     this.route.params

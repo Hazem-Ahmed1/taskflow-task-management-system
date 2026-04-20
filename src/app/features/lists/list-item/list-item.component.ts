@@ -5,6 +5,7 @@ import { List, Card, Priority } from '@core/models';
 import { ListService, CardService } from '@core/services';
 import { SharedModule } from '@shared/shared.module';
 import { CardItemComponent } from '../../cards/card-item/card-item.component';
+import { FormsModule } from '@angular/forms';
 
 /**
  * ListItemComponent - Individual list with cards
@@ -17,7 +18,7 @@ import { CardItemComponent } from '../../cards/card-item/card-item.component';
 @Component({
   selector: 'app-list-item',
   standalone: true,
-  imports: [CommonModule, SharedModule, DragDropModule, CardItemComponent],
+  imports: [CommonModule, FormsModule, SharedModule, DragDropModule, CardItemComponent],
   templateUrl: './list-item.component.html',
   styleUrls: ['./list-item.component.scss']
 })
@@ -25,6 +26,8 @@ export class ListItemComponent {
   @Input() list!: List;
   @Input() boardId!: string;
   @Output() deleted = new EventEmitter<void>();
+  /** Bubbles the clicked card up to board-content so the modal can render outside cdkDrag */
+  @Output() cardSelected = new EventEmitter<Card>();
 
   isEditing = false;
   editTitle = '';
@@ -66,6 +69,8 @@ export class ListItemComponent {
   }
 
   deleteList(): void {
+    if (!confirm(`Delete "${this.list.title}" and all its cards?`)) return;
+    this.listService.deleteList(this.boardId, this.list.id);
     this.deleted.emit();
     this.showMenu = false;
   }
@@ -117,6 +122,10 @@ export class ListItemComponent {
     // Return IDs of all list drop containers for drag & drop connection
     // This will be populated by the parent component
     return [];
+  }
+
+  onCardClicked(card: Card): void {
+    this.cardSelected.emit(card);
   }
 
   onDocumentClick(event: Event): void {

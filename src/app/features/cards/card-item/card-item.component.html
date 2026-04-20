@@ -1,4 +1,5 @@
-<div class="card" cdkDrag>
+<!-- No cdkDrag here — cdkDrag is applied to the <app-card-item> host by list-item -->
+<div class="card" [class.card-completed]="card.isCompleted" (click)="openDetail()">
   <div *ngIf="card.labels && card.labels.length > 0" class="card-labels">
     <span 
       *ngFor="let label of card.labels"
@@ -10,22 +11,42 @@
   <div class="card-title">{{ card.title }}</div>
 
   <div class="card-badges">
+    <span *ngIf="card.isCompleted" class="badge badge-completed">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Done
+    </span>
+
+    <span *ngIf="card.priority"
+          class="badge priority-badge"
+          [class.priority-urgent]="card.priority === 'urgent'"
+          [class.priority-high]="card.priority === 'high'"
+          [class.priority-medium]="card.priority === 'medium'"
+          [class.priority-low]="card.priority === 'low'">
+      {{ card.priority | titlecase }}
+    </span>
+
     <span *ngIf="card.description" class="badge" title="Has description">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-        <path d="M2 2h10v10H2z"/>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
     </span>
 
-    <span *ngIf="card.deadline" class="badge">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-        <circle cx="7" cy="7" r="6"/>
+    <span *ngIf="card.deadline"
+          class="badge"
+          [class.overdue]="isOverdue()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
       </svg>
       {{ formatDate(card.deadline) }}
     </span>
 
     <span *ngIf="card.assignedUsers && card.assignedUsers.length > 0" class="badge">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-        <path d="M7 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-3 0-7 1.5-7 3.5V14h14v-1.5c0-2-4-3.5-7-3.5z"/>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
       </svg>
       {{ card.assignedUsers.length }}
     </span>

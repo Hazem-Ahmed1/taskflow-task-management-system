@@ -35,15 +35,23 @@ export class DropdownComponent implements ControlValueAccessor {
   @Input() placeholder = 'Select an option';
   @Input() options: DropdownOption[] = [];
   @Input() disabled = false;
+
+  /** Two-way bindable value — use [(value)]="..." */
+  @Input() set value(val: any) { this._value = val; }
+  get value(): any { return this._value; }
+  @Output() valueChange = new EventEmitter<any>();
+
   @Output() selected = new EventEmitter<any>();
 
   isOpen = false;
-  value: any = null;
+  _value: any = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: any = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onTouched: any = () => {};
 
   get selectedLabel(): string {
-    const option = this.options.find(opt => opt.value === this.value);
+    const option = this.options.find(opt => opt.value === this._value);
     return option ? option.label : '';
   }
 
@@ -54,9 +62,10 @@ export class DropdownComponent implements ControlValueAccessor {
   }
 
   selectOption(option: DropdownOption): void {
-    this.value = option.value;
-    this.onChange(this.value);
-    this.selected.emit(this.value);
+    this._value = option.value;
+    this.onChange(this._value);
+    this.selected.emit(this._value);
+    this.valueChange.emit(this._value);
     this.isOpen = false;
   }
 
@@ -68,7 +77,7 @@ export class DropdownComponent implements ControlValueAccessor {
   }
 
   writeValue(value: any): void {
-    this.value = value;
+    this._value = value;
   }
 
   registerOnChange(fn: any): void {

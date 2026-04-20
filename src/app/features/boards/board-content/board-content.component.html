@@ -7,7 +7,8 @@
       class="list-wrapper">
       <app-list-item 
         [list]="list"
-        [boardId]="board!.id">
+        [boardId]="board!.id"
+        (cardSelected)="openCard($event)">
       </app-list-item>
     </div>
 
@@ -44,3 +45,15 @@
     </div>
   </div>
 </div>
+
+<!--
+  Card detail modal — rendered HERE at board-content level,
+  completely outside any cdkDrag element so position:fixed works correctly.
+-->
+<app-card-detail
+  *ngIf="selectedCard"
+  [(isOpen)]="showCardDetail"
+  [card]="selectedCard"
+  [boardId]="board?.id || ''"
+  [listId]="selectedCard.listId">
+</app-card-detail>

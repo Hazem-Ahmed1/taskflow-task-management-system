@@ -1,180 +1,211 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Card, Priority, User } from '@core/models';
 import { CardService, UserService, NotificationService } from '@core/services';
 import { SharedModule } from '@shared/shared.module';
 import { DropdownOption } from '@shared/components/dropdown/dropdown.component';
+import { AuthService } from '@core/services';
 
-/**
- * CardDetailComponent - Detailed card view and editing
- * 
- * Architecture:
- * - Modal for editing card details
- * - Manages card properties (title, description, priority, deadline, assignments)
- * - Handles comments and attachments
- */
 @Component({
   selector: 'app-card-detail',
   standalone: true,
-  imports: [CommonModule, SharedModule, ReactiveFormsModule],
+  imports: [CommonModule, SharedModule, FormsModule],
   templateUrl: './card-detail.component.html',
   styleUrls: ['./card-detail.component.scss']
 })
-export class CardDetailComponent implements OnInit {
+export class CardDetailComponent implements OnChanges {
+  // ─── Inputs / Outputs ────────────────────────────────────────────────────
+
   @Input() isOpen = false;
+  @Output() isOpenChange = new EventEmitter<boolean>();
+
   @Input() card: Card | null = null;
   @Input() boardId!: string;
   @Input() listId!: string;
-  @Output() closed = new EventEmitter<void>();
 
-  cardForm!: FormGroup;
-  newLabel = '';
-  newComment = '';
-  userOptions: DropdownOption[] = [];
+  // ─── State ───────────────────────────────────────────────────────────────
 
-  priorityOptions: DropdownOption[] = [
-    { value: Priority.LOW, label: 'Low', icon: '🟢' },
+  isEditingDescription = false;
+  editedDescription = '';
+  showMemberPicker = false;
+
+  showCompletionForm = false;
+  completionNote = '';
+
+  readonly priorityOptions: DropdownOption[] = [
+    { value: Priority.LOW,    label: 'Low',    icon: '🟢' },
     { value: Priority.MEDIUM, label: 'Medium', icon: '🟡' },
-    { value: Priority.HIGH, label: 'High', icon: '🟠' },
+    { value: Priority.HIGH,   label: 'High',   icon: '🟠' },
     { value: Priority.URGENT, label: 'Urgent', icon: '🔴' }
   ];
 
   constructor(
-    private fb: FormBuilder,
     private cardService: CardService,
     private userService: UserService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    this.initForm();
-    this.loadUsers();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['card'] || changes['isOpen']?.currentValue === false) {
+      this.isEditingDescription = false;
+      this.showMemberPicker = false;
+      this.showCompletionForm = false;
+      this.completionNote = '';
+      this.editedDescription = this.card?.description || '';
+    }
   }
 
-  initForm(): void {
+  // ─── Computed ────────────────────────────────────────────────────────────
+
+  get assignees(): User[] {
+    if (!this.card) return [];
+    return (this.card.assignedUsers || [])
+      .map(id => this.userService.getUserById(id))
+      .filter((u): u is User => !!u);
+  }
+
+  get availableUsers(): User[] {
+    const assigned = this.card?.assignedUsers ?? [];
+    return this.userService.searchUsers('').filter(u => !assigned.includes(u.id));
+  }
+
+  get isCompleted(): boolean {
+    return !!(this.card as any)?.isCompleted;
+  }
+
+  // ─── Description ─────────────────────────────────────────────────────────
+
+  startEditingDescription(): void {
+    this.editedDescription = this.card?.description || '';
+    this.isEditingDescription = true;
+  }
+
+  saveDescription(): void {
     if (!this.card) return;
-
-    this.cardForm = this.fb.group({
-      title: [this.card.title, Validators.required],
-      description: [this.card.description],
-      priority: [this.card.priority],
-      deadline: [this.card.deadline ? new Date(this.card.deadline).toISOString().split('T')[0] : ''],
-      labels: [this.card.labels || []],
-      assignedUsers: [this.card.assignedUsers || []]
-    });
+    this.updateCardField('description', this.editedDescription);
+    this.isEditingDescription = false;
   }
 
-  loadUsers(): void {
-    this.userService.getUsers().subscribe(users => {
-      this.userOptions = users.map(user => ({
-        value: user.id,
-        label: user.name
-      }));
-    });
+  cancelEditingDescription(): void {
+    this.isEditingDescription = false;
+    this.editedDescription = this.card?.description || '';
   }
 
-  saveChanges(): void {
-    if (!this.card || !this.cardForm.valid) return;
+  // ─── Field Updates ────────────────────────────────────────────────────────
 
-    const formValue = this.cardForm.value;
-    const updates: Partial<Card> = {
-      title: formValue.title,
-      description: formValue.description,
-      priority: formValue.priority,
-      deadline: formValue.deadline ? new Date(formValue.deadline) : undefined,
-      labels: formValue.labels,
-      assignedUsers: formValue.assignedUsers
-    };
-
-    this.cardService.updateCard(this.boardId, this.listId, this.card.id, updates);
-    
-    // Notify assigned users
-    const newAssignees = formValue.assignedUsers.filter(
-      (id: string) => !this.card!.assignedUsers.includes(id)
-    );
-    newAssignees.forEach((userId: string) => {
-      this.notificationService.notifyCardAssignment(userId, formValue.title, this.card!.id);
-    });
-
-    this.close();
+  updateCardField(field: string, value: unknown): void {
+    if (!this.card) return;
+    this.cardService.updateCard(this.boardId, this.listId, this.card.id, {
+      [field]: value
+    } as Partial<Card>);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this.card as any)[field] = value;
   }
 
-  addLabel(): void {
-    if (!this.newLabel.trim()) return;
-
-    const labels = this.cardForm.get('labels')?.value || [];
-    if (!labels.includes(this.newLabel)) {
-      this.cardForm.patchValue({
-        labels: [...labels, this.newLabel]
-      });
-    }
-    this.newLabel = '';
-  }
-
-  removeLabel(label: string): void {
-    const labels = this.cardForm.get('labels')?.value || [];
-    this.cardForm.patchValue({
-      labels: labels.filter((l: string) => l !== label)
-    });
-  }
-
-  assignUser(userId: string): void {
-    const assignedUsers = this.cardForm.get('assignedUsers')?.value || [];
-    if (!assignedUsers.includes(userId)) {
-      this.cardForm.patchValue({
-        assignedUsers: [...assignedUsers, userId]
-      });
+  formatDateForInput(date: Date | null | undefined): string {
+    if (!date) return '';
+    try {
+      return new Date(date).toISOString().split('T')[0];
+    } catch {
+      return '';
     }
   }
 
-  unassignUser(userId: string): void {
-    const assignedUsers = this.cardForm.get('assignedUsers')?.value || [];
-    this.cardForm.patchValue({
-      assignedUsers: assignedUsers.filter((id: string) => id !== userId)
-    });
+  updateDueDate(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.updateCardField('deadline', val ? new Date(val) : null);
   }
 
-  addComment(): void {
-    if (!this.card || !this.newComment.trim()) return;
+  // ─── Completion ───────────────────────────────────────────────────────────
 
-    const currentUser = this.userService.getCurrentUser();
-    if (!currentUser) return;
+  startComplete(): void {
+    this.showCompletionForm = true;
+    this.completionNote = '';
+  }
 
-    const comment = {
-      id: `comment_${Date.now()}`,
-      cardId: this.card.id,
-      userId: currentUser.id,
-      content: this.newComment,
-      createdAt: new Date()
+  confirmComplete(): void {
+    if (!this.card) return;
+    this.updateCardField('isCompleted', true);
+    this.updateCardField('completionNote', this.completionNote.trim());
+    this.showCompletionForm = false;
+  }
+
+  cancelComplete(): void {
+    this.showCompletionForm = false;
+    this.completionNote = '';
+  }
+
+  undoComplete(): void {
+    this.updateCardField('isCompleted', false);
+    this.updateCardField('completionNote', '');
+  }
+
+  // ─── Members ─────────────────────────────────────────────────────────────
+
+  openAddMemberModal(): void {
+    this.userService.refresh();
+    this.showMemberPicker = !this.showMemberPicker;
+  }
+
+  addMember(userId: string): void {
+    if (!this.card) return;
+    const assignedUsers = [...(this.card.assignedUsers || []), userId];
+    this.updateCardField('assignedUsers', assignedUsers);
+    this.showMemberPicker = false;
+
+    // Only notify the assignee — skip if they assigned themselves
+    const currentUserId = this.authService.currentUser?.id;
+    if (userId !== currentUserId) {
+      this.notificationService.notifyCardAssignment(userId, this.card.title, this.card.id);
+    }
+  }
+
+  removeMember(userId: string): void {
+    if (!this.card) return;
+    const assignedUsers = (this.card.assignedUsers || []).filter(id => id !== userId);
+    this.updateCardField('assignedUsers', assignedUsers);
+  }
+
+  // ─── Labels ───────────────────────────────────────────────────────────────
+
+  getLabelColor(label: string): string {
+    const palette: Record<string, string> = {
+      bug: '#eb5a46', feature: '#61bd4f', enhancement: '#00c2e0',
+      documentation: '#c377e0', urgent: '#ff9f1a', design: '#f87171',
+      backend: '#818cf8', frontend: '#34d399', devops: '#fb923c',
+      api: '#60a5fa', auth: '#a78bfa', ui: '#f9a8d4', setup: '#86efac',
+      review: '#fcd34d', meeting: '#6ee7b7', content: '#93c5fd',
+      planning: '#c4b5fd', branding: '#fca5a5', social: '#a5f3fc',
+      outreach: '#bbf7d0', learning: '#fde68a', angular: '#fca5a5',
+      career: '#ddd6fe'
     };
-
-    this.card.comments.push(comment);
-    this.newComment = '';
+    return palette[label.toLowerCase()] ?? '#94a3b8';
   }
+
+  // ─── Delete ───────────────────────────────────────────────────────────────
 
   deleteCard(): void {
-    if (!this.card || !confirm('Are you sure you want to delete this card?')) return;
-
+    if (!this.card) return;
+    if (!confirm(`Delete "${this.card.title}"? This cannot be undone.`)) return;
     this.cardService.deleteCard(this.boardId, this.listId, this.card.id);
     this.close();
   }
 
-  getUserById(userId: string): User | undefined {
-    return this.userService.getUserById(userId);
-  }
+  // ─── Modal ────────────────────────────────────────────────────────────────
 
-  formatDate(date: Date): string {
-    const d = new Date(date);
-    return d.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  onModalChange(val: boolean): void {
+    this.isOpen = val;
+    this.isOpenChange.emit(val);
+    if (!val) {
+      this.isEditingDescription = false;
+      this.showMemberPicker = false;
+      this.showCompletionForm = false;
+    }
   }
 
   close(): void {
-    this.closed.emit();
+    this.onModalChange(false);
   }
 }

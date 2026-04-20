@@ -1,6 +1,6 @@
-# TaskFlow - Task Management System
+# TaskFlow — Task Management System (Angular 17)
 
-A production-ready task management application built with Angular 17, featuring drag & drop, user collaboration, and real-time notifications.
+TaskFlow is a modern Trello-inspired task management system built with **Angular 17 (standalone components)**. It includes **authentication & authorization (fake accounts)**, a **localStorage-backed fake database**, **boards/lists/cards**, and **drag & drop** workflows with a clean, modern UI.
 
 ![Angular](https://img.shields.io/badge/Angular-17-red?style=flat-square&logo=angular)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue?style=flat-square&logo=typescript)
@@ -22,6 +22,12 @@ npm start
 ```
 
 Open browser at `http://localhost:4200`
+
+## Screenshots
+
+### Card detail (edit panel)
+
+![Card detail modal](docs/screenshots/card-detail-modal.png)
 
 ### Build for Production
 
@@ -66,6 +72,8 @@ npm run build
 
 ## Key Features
 
+✅ Authentication & authorization (demo accounts with unified user role)  
+✅ Fake database seeded from TypeScript + persisted in localStorage  
 ✅ Drag & drop lists and cards  
 ✅ Board management with custom colors  
 ✅ Card priorities and deadlines  
@@ -80,4 +88,21 @@ npm run build
 - **Language**: TypeScript 5.2
 - **Drag & Drop**: Angular CDK
 - **State Management**: RxJS BehaviorSubjects
-- **Styling**: SCSS
+- **Routing**: Angular Router + functional guards (`authGuard`, `noAuthGuard`)
+- **Persistence (Fake Backend)**: TypeScript seed data + localStorage (`DatabaseService`)
+- **Auth**: Session stored in localStorage (`AuthService`)
+- **Styling**: SCSS (design tokens, modern components, animations)
+
+## Demo Accounts
+
+Use any of these accounts on the login page:
+
+- `hazem@taskflow.io` / `hazem123`
+- `khaled@taskflow.io` / `khaled123`
+- `sara@taskflow.io` / `sara123`
+- `ahmed@taskflow.io` / `ahmed123`
+- `demo@taskflow.io` / `demo123`
+
+## Notes
+
+- **Fresh seed data**: to reset to the seeded database, clear `taskflow_db` from browser localStorage.

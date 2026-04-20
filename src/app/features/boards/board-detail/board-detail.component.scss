@@ -1,63 +1,112 @@
 .board-detail-container {
-  min-height: 100vh;
+  min-height: calc(100vh - 58px);
   position: relative;
 }
 
 .board-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.15);
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.32) 0%,
+    rgba(0, 0, 0, 0.12) 40%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
   z-index: 0;
 }
 
+/* Board Header */
 .board-header {
   position: relative;
   z-index: 1;
-  padding: 16px 24px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: white;
+  backdrop-filter: blur(2px);
 }
 
 .board-header-left,
 .board-header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(4px);
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.role-chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+
+  &.role-owner {
+    background: rgba(250, 204, 21, 0.25);
+    border-color: rgba(250, 204, 21, 0.55);
+    color: #fde68a;
+  }
 }
 
 .board-title {
   margin: 0;
-  font-size: 20px;
+  font-family: var(--font-display);
+  font-size: 19px;
   font-weight: 700;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.3px;
 }
 
 .star-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  padding: 6px 8px;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 7px 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
+  backdrop-filter: blur(4px);
 }
 
 .star-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.28);
+  color: white;
 }
 
 .star-btn.starred {
-  background: #f2d600;
-  color: #172b4d;
+  background: rgba(245, 158, 11, 0.85);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: white;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
 }
 
+/* Board Members */
 .board-members {
   display: flex;
   align-items: center;
@@ -65,68 +114,84 @@
 }
 
 .add-member-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  border: 2px dashed rgba(255, 255, 255, 0.4);
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(4px);
 }
 
 .add-member-btn:hover {
   background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
+/* Board Content */
 .board-content {
   position: relative;
   z-index: 1;
   padding: 0 16px 16px;
 }
 
+/* User Search in Modal */
 .user-search-results {
   margin-top: 16px;
   max-height: 300px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .user-result-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
   cursor: pointer;
 }
 
 .user-result-item:hover {
-  background-color: #f4f5f7;
+  background-color: var(--color-bg);
 }
 
 .user-info {
   flex: 1;
+  min-width: 0;
 }
 
 .user-name {
   font-weight: 600;
-  color: #172b4d;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-email {
   font-size: 12px;
-  color: #5e6c84;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .member-badge {
   padding: 4px 12px;
-  background-color: #e4f0f6;
-  color: #0079bf;
-  border-radius: 12px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
   font-size: 12px;
   font-weight: 600;
+  flex-shrink: 0;
 }

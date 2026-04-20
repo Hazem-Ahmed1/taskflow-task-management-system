@@ -9,6 +9,9 @@
         </svg>
       </button>
       <h1 class="board-title">{{ board.title }}</h1>
+      <span class="role-chip" [class.role-owner]="isOwner">
+        {{ isOwner ? 'Owner' : 'Member' }}
+      </span>
       <button 
         class="star-btn"
         [class.starred]="board.isStarred"

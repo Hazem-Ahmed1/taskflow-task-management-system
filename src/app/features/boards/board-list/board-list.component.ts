@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Board } from '@core/models';
 import { BoardService } from '@core/services';
+import { AuthService } from '@core/services/auth.service';
 import { SharedModule } from '@shared/shared.module';
 
 /**
@@ -34,12 +35,13 @@ export class BoardListComponent implements OnInit {
   };
 
   colorOptions = [
-    '#0079bf', '#d29034', '#519839', '#b04632',
-    '#89609e', '#cd5a91', '#4bbf6b', '#00aecc'
+    '#4f46e5', '#0891b2', '#059669', '#d97706',
+    '#dc2626', '#7c3aed', '#db2777', '#0369a1'
   ];
 
   constructor(
     private boardService: BoardService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -70,13 +72,15 @@ export class BoardListComponent implements OnInit {
       return;
     }
 
-    // Create board
+    const currentUser = this.authService.currentUser;
+    const userId = currentUser?.id ?? 'guest';
+
     const board = this.boardService.createBoard({
       title: this.newBoard.title,
       description: this.newBoard.description,
       backgroundColor: this.newBoard.backgroundColor,
-      ownerId: 'user_1', // TODO: Get from auth service
-      members: ['user_1'],
+      ownerId: userId,
+      members: [userId],
       lists: [],
       isStarred: false
     });

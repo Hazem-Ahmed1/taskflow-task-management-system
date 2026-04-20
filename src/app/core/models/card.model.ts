@@ -20,6 +20,8 @@ export interface Card {
   labels: string[];
   comments: Comment[];
   attachments: Attachment[];
+  isCompleted?: boolean;
+  completionNote?: string;
 }
 
 export interface Comment {

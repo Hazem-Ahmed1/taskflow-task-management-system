@@ -1,18 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 import { Notification, NotificationType } from '@core/models';
-import { NotificationService, UserService } from '@core/services';
+import { NotificationService, BoardService, CardNavigationService } from '@core/services';
+import { AuthService } from '@core/services/auth.service';
 import { SharedModule } from '@shared/shared.module';
 
-/**
- * NotificationCenterComponent - Notification dropdown panel
- * 
- * Architecture:
- * - Displays user notifications
- * - Mark as read functionality
- * - Clear notifications
- */
 @Component({
   selector: 'app-notification-center',
   standalone: true,
@@ -20,22 +14,43 @@ import { SharedModule } from '@shared/shared.module';
   templateUrl: './notification-center.component.html',
   styleUrls: ['./notification-center.component.scss']
 })
-export class NotificationCenterComponent implements OnInit {
+export class NotificationCenterComponent implements OnInit, OnDestroy {
   notifications$!: Observable<Notification[]>;
   showPanel = false;
   unreadCount = 0;
 
+  private sub = new Subscription();
+
   constructor(
     private notificationService: NotificationService,
-    private userService: UserService
+    private authService: AuthService,
+    private boardService: BoardService,
+    private cardNav: CardNavigationService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    const currentUser = this.userService.getCurrentUser();
-    if (currentUser) {
-      this.notifications$ = this.notificationService.getNotifications(currentUser.id);
-      this.updateUnreadCount(currentUser.id);
-    }
+    this.sub.add(
+      this.authService.currentUser$.subscribe(user => {
+        if (user) {
+          this.notifications$ = this.notificationService.getNotifications(user.id);
+          this.unreadCount = this.notificationService.getUnreadCount(user.id);
+        }
+      })
+    );
+
+    this.sub.add(
+      this.notificationService.notifications$.subscribe(() => {
+        const userId = this.authService.currentUser?.id;
+        if (userId) {
+          this.unreadCount = this.notificationService.getUnreadCount(userId);
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   togglePanel(): void {
@@ -43,33 +58,45 @@ export class NotificationCenterComponent implements OnInit {
   }
 
   handleNotificationClick(notification: Notification): void {
+    // 1. Mark as read
     if (!notification.isRead) {
       this.notificationService.markAsRead(notification.id);
-      this.updateUnreadCount();
     }
-    // TODO: Navigate to related entity (card, board, etc.)
+
+    // 2. Close the panel
+    this.showPanel = false;
+
+    // 3. Navigate to the related entity
+    if (notification.type === NotificationType.BOARD_INVITATION) {
+      // relatedEntityId is a boardId
+      this.router.navigate(['/boards', notification.relatedEntityId]);
+      return;
+    }
+
+    // For all card-related notifications, relatedEntityId is a cardId
+    const cardId = notification.relatedEntityId;
+    const boardId = this.boardService.findBoardIdByCardId(cardId);
+
+    if (boardId) {
+      // Tell board-content which card to open once the board loads
+      this.cardNav.setPendingCard(cardId);
+      this.router.navigate(['/boards', boardId]);
+    } else {
+      // Fallback: go to boards list
+      this.router.navigate(['/boards']);
+    }
   }
 
   markAllAsRead(): void {
-    const currentUser = this.userService.getCurrentUser();
-    if (currentUser) {
-      this.notificationService.markAllAsRead(currentUser.id);
-      this.updateUnreadCount(currentUser.id);
+    const userId = this.authService.currentUser?.id;
+    if (userId) {
+      this.notificationService.markAllAsRead(userId);
     }
   }
 
   deleteNotification(event: Event, notificationId: string): void {
     event.stopPropagation();
     this.notificationService.deleteNotification(notificationId);
-    this.updateUnreadCount();
-  }
-
-  clearAll(): void {
-    const currentUser = this.userService.getCurrentUser();
-    if (currentUser && confirm('Are you sure you want to clear all notifications?')) {
-      this.notificationService.clearAllNotifications(currentUser.id);
-      this.updateUnreadCount(currentUser.id);
-    }
   }
 
   getNotificationIcon(type: NotificationType): string {
@@ -81,35 +108,5 @@ export class NotificationCenterComponent implements OnInit {
       [NotificationType.BOARD_INVITATION]: '📨'
     };
     return icons[type] || '📌';
-  }
-
-  formatTime(date: Date): string {
-    const d = new Date(date);
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-
-  onDocumentClick(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.notification-center')) {
-      this.showPanel = false;
-    }
-  }
-
-  private updateUnreadCount(userId?: string): void {
-    const currentUser = userId || this.userService.getCurrentUser()?.id;
-    if (currentUser) {
-      this.unreadCount = this.notificationService.getUnreadCount(currentUser);
-    }
   }
 }

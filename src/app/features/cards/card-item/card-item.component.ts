@@ -1,17 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Card, Priority } from '@core/models';
+import { Card } from '@core/models';
 import { UserService } from '@core/services';
 import { SharedModule } from '@shared/shared.module';
 
-/**
- * CardItemComponent - Individual card display
- * 
- * Architecture:
- * - Presentation component for card
- * - Shows card details, priority, deadline, assignees
- * - Opens detail modal on click
- */
 @Component({
   selector: 'app-card-item',
   standalone: true,
@@ -24,11 +16,13 @@ export class CardItemComponent {
   @Input() boardId!: string;
   @Input() listId!: string;
 
+  /** Emitted when the user clicks the card to open the detail view */
+  @Output() cardClicked = new EventEmitter<Card>();
+
   constructor(private userService: UserService) {}
 
   openDetail(): void {
-    // TODO: Open card detail modal
-    console.log('Open card detail:', this.card);
+    this.cardClicked.emit(this.card);
   }
 
   getUserById(userId: string) {
@@ -38,14 +32,12 @@ export class CardItemComponent {
   formatDate(date: Date): string {
     const d = new Date(date);
     const now = new Date();
-    const diffTime = d.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) return 'Overdue';
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
-    if (diffDays < 7) return `${diffDays} days`;
-
+    if (diffDays < 7) return `${diffDays}d`;
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
@@ -55,16 +47,14 @@ export class CardItemComponent {
   }
 
   getLabelColor(label: string): string {
-    const colors: { [key: string]: string } = {
-      'bug': '#eb5a46',
-      'feature': '#61bd4f',
-      'enhancement': '#00c2e0',
-      'documentation': '#c377e0',
-      'urgent': '#ff9f1a',
-      'default': '#0079bf'
+    const colors: Record<string, string> = {
+      bug: '#eb5a46',
+      feature: '#61bd4f',
+      enhancement: '#00c2e0',
+      documentation: '#c377e0',
+      urgent: '#ff9f1a',
+      default: '#0079bf'
     };
-
-    const key = label.toLowerCase();
-    return colors[key] || colors['default'];
+    return colors[label.toLowerCase()] ?? colors['default'];
   }
 }
