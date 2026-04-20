@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { Notification, NotificationType } from '@core/models';
 import { NotificationService, BoardService, CardNavigationService } from '@core/services';
-import { AuthService } from '@core/services/auth.service';
+import { AuthService } from '@core/services/auth';
 import { SharedModule } from '@shared/shared.module';
 
 @Component({
@@ -68,12 +68,22 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
 
     // 3. Navigate to the related entity
     if (notification.type === NotificationType.BOARD_INVITATION) {
+      const currentUserId = this.authService.currentUser?.id;
+      if (currentUserId) {
+        // Ensure newly invited board is loaded into board state before opening.
+        this.boardService.loadBoardsForUser(currentUserId);
+      }
       // relatedEntityId is a boardId
       this.router.navigate(['/boards', notification.relatedEntityId]);
       return;
     }
 
     // For all card-related notifications, relatedEntityId is a cardId
+    const currentUserId = this.authService.currentUser?.id;
+    if (currentUserId) {
+      this.boardService.loadBoardsForUser(currentUserId);
+    }
+
     const cardId = notification.relatedEntityId;
     const boardId = this.boardService.findBoardIdByCardId(cardId);
 

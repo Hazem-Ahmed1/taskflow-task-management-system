@@ -2,7 +2,8 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Card, Priority, User } from '@core/models';
-import { CardService, UserService, NotificationService } from '@core/services';
+import { CardService, UserService, NotificationService, ActivityService } from '@core/services';
+import { ActivityAction } from '@core/models';
 import { SharedModule } from '@shared/shared.module';
 import { DropdownOption } from '@shared/components/dropdown/dropdown.component';
 import { AuthService } from '@core/services';
@@ -44,7 +45,8 @@ export class CardDetailComponent implements OnChanges {
     private cardService: CardService,
     private userService: UserService,
     private notificationService: NotificationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private activityService: ActivityService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -130,6 +132,12 @@ export class CardDetailComponent implements OnChanges {
     this.updateCardField('isCompleted', true);
     this.updateCardField('completionNote', this.completionNote.trim());
     this.showCompletionForm = false;
+
+    this.activityService.log(
+      ActivityAction.CARD_COMPLETED,
+      `Marked "${this.card.title}" as complete`,
+      { boardId: this.boardId, cardId: this.card.id }
+    );
   }
 
   cancelComplete(): void {
@@ -151,8 +159,11 @@ export class CardDetailComponent implements OnChanges {
 
   addMember(userId: string): void {
     if (!this.card) return;
+    if ((this.card.assignedUsers || []).includes(userId)) return;
+
+    this.cardService.assignUser(this.boardId, this.listId, this.card.id, userId);
     const assignedUsers = [...(this.card.assignedUsers || []), userId];
-    this.updateCardField('assignedUsers', assignedUsers);
+    this.card.assignedUsers = assignedUsers;
     this.showMemberPicker = false;
 
     // Only notify the assignee — skip if they assigned themselves
@@ -160,6 +171,13 @@ export class CardDetailComponent implements OnChanges {
     if (userId !== currentUserId) {
       this.notificationService.notifyCardAssignment(userId, this.card.title, this.card.id);
     }
+
+    const assigneeName = this.userService.getUserById(userId)?.name ?? userId;
+    this.activityService.log(
+      ActivityAction.MEMBER_ASSIGNED,
+      `Assigned ${assigneeName} to "${this.card.title}"`,
+      { boardId: this.boardId, cardId: this.card.id }
+    );
   }
 
   removeMember(userId: string): void {

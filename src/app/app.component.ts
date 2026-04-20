@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { User } from '@core/models';
-import { AuthService } from '@core/services/auth.service';
-import { BoardService } from '@core/services/board.service';
-import { NotificationService } from '@core/services/notification.service';
+import { AuthService } from '@core/services/auth';
+import { BoardService } from '@core/services/board';
+import { NotificationService } from '@core/services/notification';
 import { NotificationCenterComponent } from './features/notifications/notification-center/notification-center.component';
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
 

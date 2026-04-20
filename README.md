@@ -1,9 +1,43 @@
-# TaskFlow — Task Management System (Angular 17)
+# Taskflow - Task Management System (Angular 17+)
 
-TaskFlow is a modern Trello-inspired task management system built with **Angular 17 (standalone components)**. It includes **authentication & authorization (fake accounts)**, a **localStorage-backed fake database**, **boards/lists/cards**, and **drag & drop** workflows with a clean, modern UI.
+TaskFlow is a modern trello-inspired task management system built with **Angular 17+ (standalone components)**. It includes **authentication & authorization (demo accounts)**, **drag & drop**, **notifications**, and a clean, modern UI.
 
-![Angular](https://img.shields.io/badge/Angular-17-red?style=flat-square&logo=angular)
+![Angular](https://img.shields.io/badge/Angular-21-red?style=flat-square&logo=angular)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue?style=flat-square&logo=typescript)
+![HTML5](https://img.shields.io/badge/HTML5-orange?style=flat-square&logo=html5)
+![SCSS](https://img.shields.io/badge/SCSS-pink?style=flat-square&logo=sass)
+![Angular CDK](https://img.shields.io/badge/Angular%20CDK-UI%20Toolkit-red?style=flat-square&logo=angular)
+![RxJS](https://img.shields.io/badge/RxJS-reactive-purple?style=flat-square&logo=reactivex)
+
+
+## Screenshots
+
+### 1) Index (Landing) Page
+
+![Index (Landing) Page](docs/screenshots/1.png)
+
+### 2) Registration Page
+
+![Registration Page](docs/screenshots/2.png)
+
+### 3) Boards Page
+
+![Boards Page](docs/screenshots/3.png)
+
+### 4) Inside a Board (Lists + Cards)
+
+![Board Details (Lists + Cards)](docs/screenshots/4.png)
+
+### 5) Profile Page
+
+![Profile Page](docs/screenshots/5.png)
+
+### Build for Production
+
+```bash
+npm run build
+```
+
 
 ## Quick Start
 
@@ -21,19 +55,8 @@ npm install
 npm start
 ```
 
-Open browser at `http://localhost:4200`
+Open your browser at `http://localhost:4200` (or the next available port if 4200 is busy).
 
-## Screenshots
-
-### Card detail (edit panel)
-
-![Card detail modal](docs/screenshots/card-detail-modal.png)
-
-### Build for Production
-
-```bash
-npm run build
-```
 
 ## How to Use
 
@@ -72,19 +95,21 @@ npm run build
 
 ## Key Features
 
-✅ Authentication & authorization (demo accounts with unified user role)  
-✅ Fake database seeded from TypeScript + persisted in localStorage  
-✅ Drag & drop lists and cards  
-✅ Board management with custom colors  
-✅ Card priorities and deadlines  
-✅ User collaboration  
-✅ Real-time notifications  
-✅ Comments and descriptions  
-✅ Responsive design  
+✔ Authentication & authorization (demo accounts with unified user role)  
+✔ Fake database seeded from TypeScript + persisted in localStorage  
+✔ Drag & drop lists and cards  
+✔ Board management with custom colors  
+✔ Card priorities and deadlines  
+✔ User collaboration (members + card assignment)  
+✔ In-app notifications center  
+✔ Comments and descriptions  
+✔ Activity log  
+✔ Profile page (boards overview)  
+✔ Responsive design  
 
 ## Tech Stack
 
-- **Framework**: Angular 17 (Standalone Components)
+- **Framework**: Angular +17 (Standalone Components)
 - **Language**: TypeScript 5.2
 - **Drag & Drop**: Angular CDK
 - **State Management**: RxJS BehaviorSubjects
@@ -98,11 +123,12 @@ npm run build
 Use any of these accounts on the login page:
 
 - `hazem@taskflow.io` / `hazem123`
-- `khaled@taskflow.io` / `khaled123`
 - `sara@taskflow.io` / `sara123`
-- `ahmed@taskflow.io` / `ahmed123`
-- `demo@taskflow.io` / `demo123`
+- `nour@taskflow.io` / `nour123`
+- `khaled@taskflow.io` / `khaled123`
+- `lina@taskflow.io` / `lina123`
 
 ## Notes
 
-- **Fresh seed data**: to reset to the seeded database, clear `taskflow_db` from browser localStorage.
+- **Fresh seed data**: to reset to the seeded database, clear `taskflow_db_v2` from browser localStorage.
+- **Logout/reset session**: you can also clear `taskflow_session`.

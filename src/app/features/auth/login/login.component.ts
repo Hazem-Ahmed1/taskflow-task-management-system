@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { AuthService } from '@core/services/auth.service';
+import { AuthService } from '@core/services/auth';
 
 @Component({
   selector: 'app-login',
@@ -20,10 +20,10 @@ export class LoginComponent implements OnInit {
 
   readonly demoAccounts = [
     { email: 'hazem@taskflow.io',  password: 'hazem123',  name: 'Hazem' },
-    { email: 'khaled@taskflow.io', password: 'khaled123', name: 'Khaled' },
     { email: 'sara@taskflow.io',   password: 'sara123',   name: 'Sara' },
-    { email: 'ahmed@taskflow.io',  password: 'ahmed123',  name: 'Ahmed' },
-    { email: 'demo@taskflow.io',   password: 'demo123',   name: 'Demo User' }
+    { email: 'nour@taskflow.io',   password: 'nour123',   name: 'Nour' },
+    { email: 'khaled@taskflow.io', password: 'khaled123', name: 'Khaled' },
+    { email: 'lina@taskflow.io',   password: 'lina123',   name: 'Lina' }
   ];
 
   constructor(

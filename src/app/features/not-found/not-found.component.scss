@@ -1,0 +1,68 @@
+.not-found-page {
+  min-height: calc(100vh - 58px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at top, #e0e7ff 0%, #f8fafc 48%, #f1f5f9 100%);
+}
+
+.not-found-card {
+  width: min(560px, 100%);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.14);
+  padding: 36px 28px;
+  text-align: center;
+}
+
+.code {
+  font-size: 72px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #4f46e5;
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+}
+
+h1 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 28px;
+  font-family: var(--font-display);
+}
+
+p {
+  margin: 0;
+  color: #475569;
+  font-size: 15px;
+}
+
+.actions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.btn.primary {
+  color: white;
+  background: #4f46e5;
+}
+
+.btn.secondary {
+  color: #334155;
+  background: #ffffff;
+  border-color: #cbd5e1;
+}

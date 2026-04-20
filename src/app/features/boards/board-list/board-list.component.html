@@ -67,6 +67,30 @@
         </app-input>
 
         <div class="form-group">
+          <label>Invite Members</label>
+          <p class="member-help">Select people to add when the board is created.</p>
+          <div class="members-picker">
+            <button
+              type="button"
+              *ngFor="let user of selectableUsers"
+              class="member-option"
+              [class.selected]="isMemberSelected(user.id)"
+              (click)="toggleMemberSelection(user.id)">
+              <app-avatar
+                [imageUrl]="user.avatar || ''"
+                [name]="user.name"
+                size="small">
+              </app-avatar>
+              <div class="member-text">
+                <span class="member-name">{{ user.name }}</span>
+                <span class="member-email">{{ user.email }}</span>
+              </div>
+              <span class="member-check">{{ isMemberSelected(user.id) ? 'Added' : 'Add' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
           <label>Background Color</label>
           <div class="background-colors">
             <div
