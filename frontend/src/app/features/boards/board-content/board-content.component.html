@@ -1,0 +1,62 @@
+<div class="board-content-container">
+  <div class="lists-container" cdkDropListGroup>
+    @if (board(); as b) {
+      @for (list of b.lists; track list.id) {
+        <div class="list-wrapper">
+          <app-list-item
+            [list]="list"
+            [boardId]="b.id"
+            (cardSelected)="openCard($event)"
+            (deleted)="deleteList(list.id)">
+          </app-list-item>
+        </div>
+      }
+    }
+
+    <div class="add-list-wrapper">
+      @if (!showAddList()) {
+        <div class="add-list-trigger" (click)="showAddList.set(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Add a list</span>
+        </div>
+      } @else {
+        <div class="add-list-form">
+          <input
+            class="form-input"
+            placeholder="Enter list title..."
+            [value]="newListTitle()"
+            (input)="newListTitle.set($any($event.target).value)"
+            (keyup.enter)="createList()"
+            (keyup.escape)="cancelAddList()"
+            autofocus />
+          <div class="add-list-actions">
+            <app-button
+              variant="primary"
+              size="small"
+              [disabled]="!newListTitle().trim()"
+              (click)="createList()">
+              Add List
+            </app-button>
+            <button class="cancel-btn" (click)="cancelAddList()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 8.586L2.929 1.515 1.515 2.929 8.586 10l-7.071 7.071 1.414 1.414L10 11.414l7.071 7.071 1.414-1.414L11.414 10l7.071-7.071-1.414-1.414L10 8.586z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (selectedCard()) {
+  <app-card-detail
+    [isOpen]="showCardDetail()"
+    (isOpenChange)="showCardDetail.set($event)"
+    [card]="selectedCard()"
+    [boardId]="board()?.id ?? ''"
+    [listId]="selectedCard()!.listId">
+  </app-card-detail>
+}

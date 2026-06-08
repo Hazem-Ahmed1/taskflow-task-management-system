@@ -1,136 +1,281 @@
-## Taskflow - Task Management System (Angular 17+)
-## Live Preview 
-https://task-flow-dffc7.web.app/
+<div align="center">
 
-TaskFlow is a modern trello-inspired task management system built with **Angular 17+ (standalone components)**. It includes **authentication & authorization (demo accounts)**, **drag & drop**, **notifications**, and a clean, modern UI.
+# TaskFlow — Task Management System
 
-![Angular](https://img.shields.io/badge/Angular-17+-red?style=flat-square&logo=angular)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue?style=flat-square&logo=typescript)
-![HTML5](https://img.shields.io/badge/HTML5-orange?style=flat-square&logo=html5)
-![SCSS](https://img.shields.io/badge/SCSS-pink?style=flat-square&logo=sass)
-![Angular CDK](https://img.shields.io/badge/Angular%20CDK-UI%20Toolkit-red?style=flat-square&logo=angular)
-![RxJS](https://img.shields.io/badge/RxJS-reactive-purple?style=flat-square&logo=reactivex)
-![Hosting](https://img.shields.io/badge/Firebase%20Hosting-deploy-orange?style=flat-square&logo=firebase)
+**A full-stack Trello-inspired task management platform**  
+Built with Angular 21 on the frontend and .NET 10 Clean Architecture on the backend.
+
+---
+
+### Frontend Stack
+
+[![Angular](https://img.shields.io/badge/Angular-21-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![RxJS](https://img.shields.io/badge/RxJS-7-B7178C?style=for-the-badge&logo=reactivex&logoColor=white)](https://rxjs.dev)
+[![SCSS](https://img.shields.io/badge/SCSS-Styles-CC6699?style=for-the-badge&logo=sass&logoColor=white)](https://sass-lang.com)
+[![Angular CDK](https://img.shields.io/badge/Angular_CDK-DnD-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://material.angular.io/cdk)
+
+### Backend Stack
+
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com)
+[![C#](https://img.shields.io/badge/C%23-13-239120?style=for-the-badge&logo=csharp&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/csharp)
+[![SQL Server](https://img.shields.io/badge/SQL_Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+[![EF Core](https://img.shields.io/badge/EF_Core-9-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://learn.microsoft.com/en-us/ef/core)
+[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
+[![MediatR](https://img.shields.io/badge/MediatR-CQRS-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://github.com/jbogard/MediatR)
+
+### DevOps
+
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose)
+
+</div>
+
+---
 
 ## Screenshots
 
-### 1) Index (Landing) Page
+### Landing Page
+![Landing Page](docs/screenshots/landing%20page.png)
 
-![Index (Landing) Page](docs/screenshots/1.png)
+### Board Details
+![Board Details](docs/screenshots/board-details.png)
 
-### 2) Registration Page
+### My Profile
+![My Profile](docs/screenshots/myprofile.png)
 
-![Registration Page](docs/screenshots/2.png)
+---
 
-### 3) Boards Page
+## Features
 
-![Boards Page](docs/screenshots/3.png)
+| Feature | Description |
+|---|---|
+| **Authentication** | JWT-based login & registration with secure password hashing (BCrypt) |
+| **Board Management** | Create, edit, delete, and star boards with custom background colors |
+| **Lists & Cards** | Drag-and-drop lists and cards via Angular CDK |
+| **Card Details** | Priority levels, deadlines, labels, descriptions, and completion notes |
+| **Collaboration** | Invite members to boards, assign multiple users to cards |
+| **Notifications** | In-app notification center with unread count badge |
+| **Activity Log** | Full audit trail of all actions per board and globally |
+| **Profile Page** | Overview of owned boards, invited boards, and task stats |
+| **Responsive UI** | Mobile-friendly layout with smooth animations |
 
-### 4) Inside a Board (Lists + Cards)
+---
 
-![Board Details (Lists + Cards)](docs/screenshots/4.png)
+## Architecture
 
-### 5) Profile Page
+### Backend — Clean Architecture + Vertical Slices
 
-![Profile Page](docs/screenshots/5.png)
+The backend follows **Clean Architecture** with **Vertical Slice Architecture** inside the Application layer — each feature is fully self-contained.
 
-### Build for Production
-
-```bash
-npm run build
+```
+backend/TaskManagement/
+├── TaskManagement.Domain/           # Entities, Enums (no dependencies)
+│   ├── Entities/                    # User, Board, List, Card, Comment, Activity...
+│   └── Enums/                       # Priority, NotificationType, ActivityAction
+│
+├── TaskManagement.Application/      # Use-cases, DTOs, CQRS (depends on Domain only)
+│   ├── Features/
+│   │   ├── Auth/Commands/           # Login, Register
+│   │   ├── Boards/Queries|Commands/ # GetAll, GetById, Create, Update, Delete, Star...
+│   │   ├── Cards/Queries|Commands/  # GetById, Create, Update, Move, Assign, Complete
+│   │   ├── Lists/Commands/          # Create, Update, Delete, Reorder
+│   │   ├── Users/Queries/           # GetAll, GetById, Search
+│   │   ├── Notifications/           # GetByUser, MarkRead, MarkAllRead
+│   │   └── Activity/Queries/        # GetAll, GetByBoard
+│   ├── DTOs/                        # BoardSummaryDto, CardDto, UserDto...
+│   └── Common/                      # IApplicationDbContext, ValidationBehavior
+│
+├── TaskManagement.Infrastructure/   # EF Core, JWT, BCrypt (depends on Domain + Application)
+│   ├── Persistence/
+│   │   ├── TaskManagementDbContext.cs
+│   │   └── DbInitializer.cs         # Seeds 5 demo users + sample boards/cards
+│   └── Services/
+│       ├── JwtTokenService.cs
+│       └── PasswordService.cs
+│
+└── TaskManagement.Api/              # ASP.NET Core Web API (depends on Application + Infrastructure)
+    ├── Controllers/                 # AuthController, BoardsController, CardsController...
+    └── Program.cs                   # JWT auth, CORS, Swagger, DI wiring
 ```
 
+**Patterns used:**
+- **CQRS** via MediatR — every operation is an explicit Command or Query
+- **Vertical Slices** — each feature folder contains its own Command/Query/Handler/Validator
+- **Repository abstraction** — `IApplicationDbContext` keeps handlers decoupled from EF Core
+- **Pipeline behaviors** — FluentValidation runs automatically before every handler
 
-## Quick Start
+---
 
-### Prerequisites
-- Node.js 18+
-- npm 9+
+### Frontend — Angular 21 Modern Patterns
 
-### Installation & Run
+The frontend uses the latest Angular APIs throughout — no legacy patterns.
 
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm start
+```
+frontend/src/app/
+├── core/
+│   ├── models/          # TypeScript interfaces matching backend DTOs
+│   ├── services/        # Signal-based services (boards, cards, auth, notifications...)
+│   ├── guards/          # Functional auth guards (authGuard, noAuthGuard)
+│   └── interceptors/    # auth.interceptor — attaches JWT Bearer token to every request
+├── features/
+│   ├── auth/            # Login, Register
+│   ├── boards/          # Board list, Board detail, Board content
+│   ├── cards/           # Card item, Card detail modal
+│   ├── lists/           # List item with inline editing
+│   ├── notifications/   # Notification center
+│   ├── activity/        # Activity log
+│   └── profile/         # User profile page
+└── shared/              # Button, Avatar, Modal, Dropdown reusable components
 ```
 
-Open your browser at `http://localhost:4200` (or the next available port if 4200 is busy).
+**Patterns used:**
 
+| Pattern | Usage |
+|---|---|
+| `signal()` / `computed()` | All reactive state in services and components |
+| `input()` / `output()` | Component props replace `@Input()` / `@Output()` |
+| `@if` / `@for` / `@switch` | New block syntax replaces `*ngIf` / `*ngFor` |
+| `inject()` | Dependency injection replaces constructor injection |
+| `ChangeDetectionStrategy.OnPush` | Applied to every component for performance |
+| `effect()` | Side-effects triggered by signal changes (replaces `ngOnChanges`) |
+| Functional interceptor | `authInterceptor` attaches JWT without a class-based interceptor |
+| `HttpClient` only | Zero localStorage for state — everything talks to the REST API |
 
-## How to Use
+---
 
-### Managing Boards
-1. **Create Board**: Click "Create New Board" button on home page
-2. **Edit Board**: Click pencil icon on board card
-3. **Star Board**: Click star icon to mark as favorite
-4. **Open Board**: Click on any board card to view details
+## API Reference
 
-### Working with Lists
-1. **Add List**: Click "Add List" button on board page
-2. **Edit List**: Click list title to edit inline
-3. **Reorder Lists**: Drag and drop lists horizontally
-4. **Delete List**: Click trash icon on list
+The backend exposes a full REST API documented via **Swagger UI** at `/swagger`.
 
-### Managing Cards
-1. **Create Card**: Click "Add Card" in any list
-2. **Edit Card**: Click on card to open details modal
-3. **Move Cards**: Drag cards between lists or within same list
-4. **Set Priority**: Choose Low, Medium, High, or Urgent in card details
-5. **Set Deadline**: Click date picker in card details
-6. **Assign Users**: Search and add users to cards
-7. **Add Comments**: Type in comment box in card details
+| Group | Endpoints |
+|---|---|
+| **Auth** | `POST /api/auth/login` · `POST /api/auth/register` |
+| **Users** | `GET /api/users` · `GET /api/users/{id}` · `GET /api/users/search?q=` · `GET /api/users/me` |
+| **Boards** | `GET/POST /api/boards` · `GET/PUT/DELETE /api/boards/{id}` · `PUT /api/boards/{id}/star` |
+| **Members** | `POST /api/boards/{id}/members` · `DELETE /api/boards/{id}/members/{userId}` |
+| **Lists** | `GET/POST /api/boards/{boardId}/lists` · `PUT/DELETE /api/lists/{id}` · `PUT /api/boards/{boardId}/lists/reorder` |
+| **Cards** | `GET/POST /api/lists/{listId}/cards` · `GET/PUT/DELETE /api/cards/{id}` · `PUT /api/cards/{id}/move` · `PUT /api/cards/{id}/complete` |
+| **Assignees** | `POST/DELETE /api/cards/{id}/assignees/{userId}` |
+| **Notifications** | `GET /api/notifications` · `PUT /api/notifications/{id}/read` · `PUT /api/notifications/read-all` |
+| **Activity** | `GET /api/activity` · `GET /api/boards/{boardId}/activity` |
 
-### Notifications
-- Click bell icon (top right) to view notifications
-- Badge shows unread count
-- Click notification to mark as read
-- "Clear All" to dismiss all notifications
+All endpoints except `auth/login` and `auth/register` require a `Bearer` token.
 
-### User Features
-- Search users by name
-- View user avatars
-- Add/remove board members
-- Assign multiple users to cards
+---
 
-## Key Features
+## Getting Started
 
-✔ Authentication & authorization (demo accounts with unified user role)  
-✔ Fake database seeded from TypeScript + persisted in localStorage  
-✔ Drag & drop lists and cards  
-✔ Board management with custom colors  
-✔ Card priorities and deadlines  
-✔ User collaboration (members + card assignment)  
-✔ In-app notifications center  
-✔ Comments and descriptions  
-✔ Activity log  
-✔ Profile page (boards overview)  
-✔ Responsive design  
+### Option 1 — Docker Compose (recommended)
 
-## Tech Stack
+**Prerequisites:** Docker Desktop
 
-- **Framework**: Angular +17 (Standalone Components)
-- **Language**: TypeScript 5.2
-- **Drag & Drop**: Angular CDK
-- **State Management**: RxJS BehaviorSubjects
-- **Routing**: Angular Router + functional guards (`authGuard`, `noAuthGuard`)
-- **Persistence (Fake Backend)**: TypeScript seed data + localStorage (`DatabaseService`)
-- **Auth**: Session stored in localStorage (`AuthService`)
-- **Styling**: SCSS (design tokens, modern components, animations)
+```bash
+# 1. Clone the repository
+git clone <repo-url>
+cd TASKFLOW-Task-management-system
+
+# 2. Copy the environment file and edit if needed
+cp .env.example .env
+
+# 3. Start everything (SQL Server + backend + frontend)
+docker compose up --build
+```
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:4200 |
+| Backend API | http://localhost:5034/api |
+| Swagger UI | http://localhost:5034/swagger |
+| SQL Server | localhost:1433 |
+
+> SQL Server may take ~30 seconds on first start. The backend waits for it automatically.
+
+---
+
+### Option 2 — Local Development
+
+**Prerequisites:** .NET 10 SDK · Node.js 22+ · SQL Server (LocalDB or full)
+
+#### Backend
+
+```bash
+cd backend/TaskManagement/TaskManagement.Api
+
+# Edit appsettings.Development.json with your connection string and JWT secret
+# (see appsettings.Development.json — it is gitignored so safe to put secrets there)
+
+dotnet run
+# API: https://localhost:7207   Swagger: https://localhost:7207/swagger
+```
+
+The database is created and seeded automatically on first run (`EnsureCreated` + `DbInitializer`).
+
+#### Frontend
+
+```bash
+cd frontend
+
+npm install --legacy-peer-deps
+ng serve
+# App: http://localhost:4200
+```
+
+---
+
+## Environment Variables
+
+All secrets live in `.env` (gitignored). Copy `.env.example` to get started.
+
+| Variable | Used by | Description |
+|---|---|---|
+| `DB_SA_PASSWORD` | Docker / SQL Server | SA password for the SQL Server container |
+| `DB_CONNECTION_STRING` | Backend | Full ADO.NET connection string |
+| `JWT_SECRET` | Backend | HMAC-SHA256 signing key (min 32 chars) |
+| `JWT_ISSUER` | Backend | JWT `iss` claim |
+| `JWT_AUDIENCE` | Backend | JWT `aud` claim |
+| `JWT_EXPIRY_MINUTES` | Backend | Token lifetime in minutes |
+| `FRONTEND_API_URL` | Frontend (Docker build) | Base URL the Angular app uses to reach the API |
+
+---
 
 ## Demo Accounts
 
-Use any of these accounts on the login page:
+These accounts are seeded automatically on first run:
 
-- `hazem@taskflow.io` / `hazem123`
-- `sara@taskflow.io` / `sara123`
-- `nour@taskflow.io` / `nour123`
-- `khaled@taskflow.io` / `khaled123`
-- `lina@taskflow.io` / `lina123`
+| Name | Email | Password |
+|---|---|---|
+| Hazem Ahmed | `hazem@taskflow.io` | `hazem123` |
+| Sara Mostafa | `sara@taskflow.io` | `sara123` |
+| Nour Ali | `nour@taskflow.io` | `nour123` |
+| Khaled Hassan | `khaled@taskflow.io` | `khaled123` |
+| Lina Youssef | `lina@taskflow.io` | `lina123` |
 
-## Notes
+---
 
-- **Fresh seed data**: to reset to the seeded database, clear `taskflow_db_v2` from browser localStorage.
-- **Logout/reset session**: you can also clear `taskflow_session`.
+## Project Structure
+
+```
+TASKFLOW-Task-management-system/
+├── .env                    # Local secrets (gitignored)
+├── .env.example            # Template — copy to .env
+├── docker-compose.yml      # Full-stack Docker setup
+├── backend/
+│   └── TaskManagement/
+│       ├── Dockerfile
+│       ├── TaskManagement.sln
+│       ├── TaskManagement.Api/
+│       ├── TaskManagement.Application/
+│       ├── TaskManagement.Domain/
+│       ├── TaskManagement.Infrastructure/
+│       └── TaskManagement.Tests/
+├── frontend/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── src/
+│       └── app/
+│           ├── core/        # Models, services, guards, interceptors
+│           ├── features/    # Auth, boards, cards, lists, profile, notifications
+│           └── shared/      # Reusable UI components
+└── docs/
+    └── screenshots/         # Add your screenshots here
+```

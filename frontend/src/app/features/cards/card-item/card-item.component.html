@@ -1,0 +1,75 @@
+<div class="card" [class.card-completed]="card().isCompleted" (click)="openDetail()">
+  @if (card().labels && card().labels.length > 0) {
+    <div class="card-labels">
+      @for (label of card().labels; track label) {
+        <span class="card-label" [style.background-color]="getLabelColor(label)"></span>
+      }
+    </div>
+  }
+
+  <div class="card-title">{{ card().title }}</div>
+
+  <div class="card-badges">
+    @if (card().isCompleted) {
+      <span class="badge badge-completed">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Done
+      </span>
+    }
+
+    @if (card().priority) {
+      <span class="badge priority-badge"
+        [class.priority-urgent]="card().priority === 'Urgent'"
+        [class.priority-high]="card().priority === 'High'"
+        [class.priority-medium]="card().priority === 'Medium'"
+        [class.priority-low]="card().priority === 'Low'">
+        {{ card().priority }}
+      </span>
+    }
+
+    @if (card().description) {
+      <span class="badge" title="Has description">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </span>
+    }
+
+    @if (card().deadline) {
+      <span class="badge" [class.overdue]="isOverdue()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        {{ formatDate(card().deadline!) }}
+      </span>
+    }
+
+    @if (card().assignedUserIds && card().assignedUserIds.length > 0) {
+      <span class="badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+        </svg>
+        {{ card().assignedUserIds.length }}
+      </span>
+    }
+  </div>
+
+  @if (card().assignedUserIds && card().assignedUserIds.length > 0) {
+    <div class="card-members">
+      @for (userId of card().assignedUserIds.slice(0, 3); track userId) {
+        <app-avatar
+          [imageUrl]="getUserById(userId)?.avatar ?? ''"
+          [name]="getUserById(userId)?.name ?? ''"
+          size="small">
+        </app-avatar>
+      }
+      @if (card().assignedUserIds.length > 3) {
+        <span class="more-members">+{{ card().assignedUserIds.length - 3 }}</span>
+      }
+    </div>
+  }
+</div>

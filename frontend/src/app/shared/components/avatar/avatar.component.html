@@ -1,0 +1,11 @@
+<div
+  class="avatar"
+  [class]="'avatar-' + size()"
+  [style.background-color]="backgroundColor"
+  [title]="name()">
+  @if (imageUrl()) {
+    <img [src]="imageUrl()" [alt]="name()" />
+  } @else {
+    <span class="initials">{{ initials }}</span>
+  }
+</div>

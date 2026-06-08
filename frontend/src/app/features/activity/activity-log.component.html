@@ -1,0 +1,65 @@
+<div class="activity-page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Activity Log
+      </h1>
+      <p class="page-sub">Everything that happened in your workspace</p>
+    </div>
+  </div>
+
+  @if (groups().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>No activity yet</h3>
+      <p>Start creating boards, lists, and cards — they'll all appear here.</p>
+      <a routerLink="/boards" class="empty-cta">Go to Boards</a>
+    </div>
+  } @else {
+    <div class="timeline">
+      @for (group of groups(); track group.label) {
+        <div class="day-group">
+          <div class="date-label"><span>{{ group.label }}</span></div>
+
+          @for (e of group.entries; track e.id) {
+            <div class="entry">
+              <div class="entry-avatar">
+                <app-avatar
+                  [imageUrl]="getUser(e.userId)?.avatar ?? ''"
+                  [name]="getActorLabel(e.userId)"
+                  size="medium">
+                </app-avatar>
+              </div>
+
+              <div class="action-dot" [class]="getColorClass(e.action)">
+                <i [class]="getIconClass(e.action)"></i>
+              </div>
+
+              <div class="entry-body">
+                <p class="entry-text">
+                  <span class="actor-name">{{ getActorLabel(e.userId) }}</span>
+                  {{ e.description }}
+                </p>
+                <div class="entry-meta">
+                  <span class="time-ago">{{ timeAgo(e.createdAt) }}</span>
+                  @if (e.boardId) {
+                    <button class="board-link" (click)="navigateToBoard(e)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                      </svg>
+                      {{ e.boardTitle }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
